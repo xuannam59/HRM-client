@@ -9,9 +9,9 @@ const loginAPI = (email, password) => {
     return axios.post(URL_BACKEND, data);
 }
 
-const registerAPI = (fullName, email, password, configPasword) => {
+const registerAPI = (fullName, email, password, configPassword) => {
     const URL_BACKEND = "api/v1/auth/register";
-    const data = { fullName, email, password, configPasword }
+    const data = { fullName, email, password, configPassword }
     return axios.post(URL_BACKEND, data);
 }
 export { loginAPI, registerAPI };

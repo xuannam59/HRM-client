@@ -15,6 +15,7 @@ const SignUp = () => {
   const HandleSignUp = async (values) => {
     setIsLoading(true);
     const res = await registerAPI(values.fullName, values.email, values.password, values.configPassword);
+    console.log(res);
     if (res.data) {
       notification.success({
         message: "Register success",
@@ -24,9 +25,10 @@ const SignUp = () => {
     } else {
       notification.error({
         message: "Register error",
-        description: "Account created error"
+        description: res.message
       });
     }
+
     setIsLoading(false);
   }
   return (
