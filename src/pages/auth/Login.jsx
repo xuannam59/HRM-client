@@ -1,7 +1,8 @@
-import { Button, Card, Checkbox, Form, Input, Space, Typography } from "antd";
+import { Button, Card, Checkbox, Form, Input, message, notification, Space, Typography } from "antd";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
+import { loginAPI } from "../../api/handleAPI";
 
 
 const { Title, Paragraph, Text } = Typography
@@ -10,8 +11,19 @@ const Login = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isRemember, setIsRemember] = useState(false);
     const [form] = Form.useForm();
-    const HandleLogin = (values) => {
-        console.log(values);
+    const HandleLogin = async (values) => {
+        setIsLoading(true);
+        const res = await loginAPI(values.email, values.password);
+        if (res.data) {
+            message.success("Login Success");
+
+        } else {
+            notification.error({
+                message: "Error",
+                description: JSON.stringify(res.message)
+            })
+        }
+        setIsLoading(false);
     }
     return (
         <>
@@ -26,7 +38,6 @@ const Login = () => {
                     form={form}
                     layout="vertical"
                     onFinish={HandleLogin}
-                    disabled={isLoading}
                     size="large"
                 >
                     <Form.Item
@@ -74,6 +85,7 @@ const Login = () => {
                         onClick={() => form.submit()}
                         style={{ width: "100%" }}
                         size="large"
+                        loading={isLoading}
                     >Sign in</Button>
                 </div>
                 <SocialLogin />

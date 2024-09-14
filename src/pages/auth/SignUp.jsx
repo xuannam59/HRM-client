@@ -1,16 +1,33 @@
-import { Button, Card, Form, Input, Space, Typography } from "antd";
+import { Button, Card, Form, Input, notification, Space, Typography } from "antd";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
+import { registerAPI } from "../../api/handleAPI";
 
 const { Title, Paragraph, Text } = Typography
 
 const SignUp = () => {
-
   const [isLoading, setIsLoading] = useState(false);
   const [form] = Form.useForm();
-  const HandleSignUp = (values) => {
-    console.log(values);
+
+  const navigate = useNavigate();
+
+  const HandleSignUp = async (values) => {
+    setIsLoading(true);
+    const res = await registerAPI(values.fullName, values.email, values.password, values.configPassword);
+    if (res.data) {
+      notification.success({
+        message: "Register success",
+        description: "Account created successfully"
+      });
+      navigate("/login");
+    } else {
+      notification.error({
+        message: "Register error",
+        description: "Account created error"
+      });
+    }
+    setIsLoading(false);
   }
   return (
     <>
@@ -25,7 +42,6 @@ const SignUp = () => {
           form={form}
           layout="vertical"
           onFinish={HandleSignUp}
-          disabled={isLoading}
           size="large"
         >
           <Form.Item
@@ -83,6 +99,7 @@ const SignUp = () => {
             onClick={() => form.submit()}
             style={{ width: "100%" }}
             size="large"
+            loading={isLoading}
           >Get started</Button>
         </div>
         <SocialLogin />
