@@ -1,0 +1,10 @@
+a {
+  text-decoration: none;
+}
+
+.content-center {
+  display: flex;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
