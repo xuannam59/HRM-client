@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
 import { loginAPI } from "../../api/handleAPI";
+import { useDispatch } from "react-redux";
+import { addAuth } from "../../redux/reducers/authReducer";
 
 
 const { Title, Paragraph, Text } = Typography
@@ -11,12 +13,16 @@ const Login = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isRemember, setIsRemember] = useState(false);
     const [form] = Form.useForm();
+
+    const dispatch = useDispatch();
+
     const HandleLogin = async (values) => {
         setIsLoading(true);
         const res = await loginAPI(values.email, values.password);
         if (res.data) {
+            localStorage.setItem("authData", JSON.stringify(res.data));
+            dispatch(addAuth(res.data));
             message.success("Login Success");
-
         } else {
             notification.error({
                 message: "Error",
