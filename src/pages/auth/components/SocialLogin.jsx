@@ -38,7 +38,6 @@ const SocialLogin = () => {
                             })
                         }
                     } catch (error) {
-                        console.log(error);
                         notification.error({
                             message: "Error",
                             description: error
@@ -48,10 +47,16 @@ const SocialLogin = () => {
                     }
                 }
             } else {
-                console.log("Can`t not login with google")
+                notification.error({
+                    message: "Login fail",
+                    description: "Can`t not login with google"
+                })
             }
         } catch (error) {
-            console.log(error);
+            notification.error({
+                message: "Error",
+                description: error.message
+            });
         } finally {
             setIsLoading(false);
         }
