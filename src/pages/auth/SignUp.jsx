@@ -2,7 +2,7 @@ import { Button, Card, Form, Input, notification, Space, Typography } from "antd
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
-import { registerAPI } from "../../api/handleAPI";
+import HandelAPI from "../../api/handleAPI";
 
 const { Title, Paragraph, Text } = Typography
 
@@ -14,7 +14,14 @@ const SignUp = () => {
 
   const HandleSignUp = async (values) => {
     setIsLoading(true);
-    const res = await registerAPI(values.fullName, values.email, values.password, values.configPassword);
+    const api = "auth/register"
+    const data = {
+      fullName: values.fullName,
+      email: values.email,
+      password: values.password,
+      confirmPassword: values.confirmPassword
+    }
+    const res = await HandelAPI(api, data, "post");
     if (res.data) {
       notification.success({
         message: "Register success",
@@ -84,7 +91,7 @@ const SignUp = () => {
           </Form.Item>
           <Form.Item
             label="Config Password"
-            name="configPassword"
+            name="confirmPassword"
             rules={[
               {
                 required: true,

@@ -2,25 +2,29 @@ import { Button, Card, Checkbox, Form, Input, message, notification, Space, Typo
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
-import { loginAPI } from "../../api/handleAPI";
+import HandelAPI from "../../api/handleAPI";
 import { useDispatch } from "react-redux";
 import { addAuth } from "../../redux/reducers/authReducer";
+import { auth } from "../../firebase/firebaseConfig";
 
 
 const { Title, Paragraph, Text } = Typography
 
 const Login = () => {
     const [isLoading, setIsLoading] = useState(false);
-    const [isRemember, setIsRemember] = useState(false);
+    // const [isRemember, setIsRemember] = useState(false);
     const [form] = Form.useForm();
-
     const dispatch = useDispatch();
 
     const HandleLogin = async (values) => {
         setIsLoading(true);
-        const res = await loginAPI(values.email, values.password);
+        const api = 'auth/login';
+        const data = {
+            email: values.email,
+            password: values.password
+        }
+        const res = await HandelAPI(api, data, 'post');
         if (res.data) {
-            localStorage.setItem("authData", JSON.stringify(res.data));
             dispatch(addAuth(res.data));
             message.success("Login Success");
         } else {
@@ -73,7 +77,7 @@ const Login = () => {
                     >
                         <Input.Password allowClear maxLength={100} placeholder="Enter password" />
                     </Form.Item>
-                    <div className="row">
+                    {/* <div className="row">
                         <div className="col">
                             <Checkbox
                                 checked={isRemember}
@@ -83,7 +87,7 @@ const Login = () => {
                         <div className="col text-end" >
                             <Link to={"/"}>Forgot password</Link>
                         </div>
-                    </div>
+                    </div> */}
                 </Form>
                 <div className="mt-4 mb-3">
                     <Button
@@ -103,7 +107,7 @@ const Login = () => {
                         <Link to={"/sign-up"}>Sign up</Link>
                     </Space>
                 </div>
-            </Card>
+            </Card >
         </>
     );
 }
