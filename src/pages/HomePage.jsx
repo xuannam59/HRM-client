@@ -1,15 +1,12 @@
 import { Button, notification } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { authSelector, refreshToken, removeAuth } from "../redux/reducers/authReducer";
-import { auth } from "../firebase/firebaseConfig";
 import handleApi from "../api/handleAPI";
 
 const HomePage = () => {
     const dispatch = useDispatch();
-    const auth = useSelector(authSelector);
 
     const logOut = () => {
-        auth.signOut();
         dispatch(removeAuth({}));
     }
     // lấy dữ liệu nếu mà token k đúng thì k có quyền và nếu token hết hạn thì xét lại 
