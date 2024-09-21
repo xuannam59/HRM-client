@@ -8,9 +8,7 @@ import { addAuth } from "../../../redux/reducers/authReducer";
 
 const provider = new GoogleAuthProvider();
 provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
-provider.setCustomParameters({
-    'login_hint': 'leeminhnam2k2@gmail.com'
-})
+
 const SocialLogin = () => {
     const [isLoading, setIsLoading] = useState(false);
     const dispatch = useDispatch();
@@ -25,6 +23,7 @@ const SocialLogin = () => {
                     const data = {
                         fullName: user.displayName,
                         email: user.email,
+                        avatar: user.photoURL
                     }
                     const api = "auth/google-login";
                     try {

@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { authSelector } from "../redux/reducers/authReducer";
 import { BrowserRouter, Routes, Route } from "react-router-dom"
-import { Layout } from "antd";
+import { Affix, Layout } from "antd";
 import { HeaderComponent, SiderComponent } from "../components";
 import { ClassPage, HomePage, StudentPage, TeacherPage } from "../pages";
 

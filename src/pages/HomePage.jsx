@@ -4,11 +4,6 @@ import { authSelector, refreshToken, removeAuth } from "../redux/reducers/authRe
 import handleApi from "../api/handleAPI";
 
 const HomePage = () => {
-    const dispatch = useDispatch();
-
-    const logOut = () => {
-        dispatch(removeAuth({}));
-    }
     // lấy dữ liệu nếu mà token k đúng thì k có quyền và nếu token hết hạn thì xét lại 
     // const getTeacher = async () => {
     //     const api = 'school/teachers';
@@ -42,7 +37,7 @@ const HomePage = () => {
     // }
     return (
         <>
-            <Button onClick={logOut}>Log out</Button>
+            Home Page
         </>
     );
 }
