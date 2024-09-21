@@ -1,29 +1,38 @@
-import { Avatar, Button, DatePicker, Form, Input, Modal, notification, Radio, Select } from "antd";
-import { useState } from "react";
+import { Avatar, Form, Input, Modal, notification, Radio, Select } from "antd";
+import { useEffect, useState } from "react";
 import handleApi from "../api/handleAPI";
 import { uploadFile } from "../utils/uploadFile";
 import { replaceName } from "../utils/replaceName";
 
+
 const ToggleModal = (props) => {
     const { loadData,
-        visible, setVisible
+        visible, onClose,
+        teacherSelected
     } = props
     const [isLoading, setIsLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState(undefined);
     const [preview, setPreview] = useState(undefined);
     const [form] = Form.useForm();
 
+    useEffect(() => {
+        if (teacherSelected) {
+            setPreview(teacherSelected.avatar);
+            form.setFieldsValue(teacherSelected);
+        }
+    }, [teacherSelected]);
     const handleCancel = () => {
-        setVisible(false);
         form.resetFields();
         setSelectedFile(undefined);
         setPreview(undefined);
+        onClose();
     }
 
     const onSelectFile = (event) => {
         if (!event.target.files || event.target.files.length === 0) {
             setPreview(null);
             setSelectedFile(null);
+            return;
         }
 
         const fileUpload = event.target.files[0];
@@ -34,25 +43,27 @@ const ToggleModal = (props) => {
     const onFinish = async (values) => {
         setIsLoading(true);
         const data = values;
-        const api = `/teachers/create`;
+        const api = `/teachers/${teacherSelected ? `update/${teacherSelected._id}` : "create"}`;
 
-        if (selectedFile) {
+        if (selectedFile && preview) {
             data.avatar = await uploadFile(selectedFile);
         }
         data.slug = replaceName(values.fullName);
         try {
-            const res = await handleApi(api, data, "post");
+            const res = await handleApi(api, data, `${teacherSelected ? "put" : "post"}`);
             if (res.data) {
-                form.resetFields();
-                setVisible(false);
+                handleCancel();
                 loadData();
-                notification.success({
+                notification.success(teacherSelected ? {
+                    message: "Updata Susseccfully",
+                    description: "Cập nhập giáo viên thành công"
+                } : {
                     message: "Create Susseccfully",
                     description: "Tạo giáo viên thành công"
                 });
             } else {
                 notification.error({
-                    message: "Create Error",
+                    message: "Error",
                     description: res.message
                 });
                 form.setFieldsValue({
@@ -69,18 +80,18 @@ const ToggleModal = (props) => {
         <>
             <Modal
                 closable={!isLoading}
-                title="Create Teacher"
+                title={teacherSelected ? "Update Teacher" : "Create Teacher"}
                 open={visible}
                 onCancel={handleCancel}
                 onOk={() => form.submit()}
+                okText={teacherSelected ? "UPDATE" : "CREATE"}
+                okButtonProps={{
+                    loading: isLoading
+                }}
                 maskClosable={false}
                 style={{
                     maxWidth: "800px",
                     minWidth: "700px"
-                }}
-                okText={"CREATE"}
-                okButtonProps={{
-                    loading: isLoading
                 }}
             >
                 <Form
@@ -107,32 +118,19 @@ const ToggleModal = (props) => {
                             }}>Upload</label>
                         </div>
                     </div>
+                    <Form.Item
+                        name={"fullName"}
+                        label="Họ tên"
+                        rules={[
+                            {
+                                required: true,
+                                message: "Vui lòng nhập họ tên!"
+                            }
+                        ]}
+                    >
 
-                    <div className="row">
-                        <div className="col">
-                            <Form.Item
-                                name={"fullName"}
-                                label="Họ tên"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "Vui lòng nhập họ tên!"
-                                    }
-                                ]}
-                            >
-
-                                <Input placeholder="Full Name" />
-                            </Form.Item>
-                        </div>
-                        <div className="col">
-                            <Form.Item
-                                name={"birdDay"}
-                                label={"Ngày sinh"}
-                            >
-                                <DatePicker />
-                            </Form.Item>
-                        </div>
-                    </div>
+                        <Input placeholder="Full Name" />
+                    </Form.Item>
 
                     <div className="row">
                         <div className="col-6">
@@ -220,12 +218,13 @@ const ToggleModal = (props) => {
                                 name={"password"}
                                 label="Mật khẩu"
                                 rules={[
-                                    {
-                                        required: true,
-                                        message: "Vui lòng nhập mật khẩu"
-                                    }
+                                    (teacherSelected ? {} :
+                                        {
+                                            required: true,
+                                            message: "Vui lòng nhập mật khẩu"
+                                        }
+                                    )
                                 ]}
-                                hasFeedback
                             >
                                 <Input.Password placeholder="Password" />
                             </Form.Item>

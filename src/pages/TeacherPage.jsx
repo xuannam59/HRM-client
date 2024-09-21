@@ -1,9 +1,9 @@
-import { Button, Popconfirm, Radio, Space, Table, Tag, Typography } from "antd";
+import { Button, Popconfirm, Radio, Space, Table, Tag, Tooltip, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { IoIosAdd } from "react-icons/io";
 import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
 import ToggleModal from "../modals/ToggleModal";
-import HandelAPI from "../api/handleAPI";
+import handelAPI from "../api/handleAPI";
 
 const { Title } = Typography;
 
@@ -11,6 +11,7 @@ const TeacherPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [visible, setVisible] = useState(false);
     const [dataSource, setDataSource] = useState([]);
+    const [teacherSelected, setTeacherSelected] = useState();
     useEffect(() => {
         loadData();
     }, []);
@@ -19,13 +20,13 @@ const TeacherPage = () => {
         setIsLoading(true);
         const api = `/teachers`;
         try {
-            const res = await HandelAPI(api);
-            if (res.data) {
-                setDataSource(res.data);
-                setIsLoading(false);
-            }
+            const res = await handelAPI(api);
+
+            res.data && setDataSource(res.data);
         } catch (error) {
             console.log(error);
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -81,7 +82,8 @@ const TeacherPage = () => {
         },
         {
             title: "Action",
-            render: (_, record) => {
+            fixed: "right",
+            render: (item) => {
                 return (<>
 
                     <Space>
@@ -94,15 +96,24 @@ const TeacherPage = () => {
                             okText="Yes"
                             cancelText="No"
                         >
+
                             <Button type="text" icon={<MdOutlineDeleteForever size={20} />} danger />
                         </Popconfirm>
-                        <Button type="link" icon={<MdOutlineEdit size={20} />} />
+                        <Tooltip title="Edit" color="#2db7f5">
+                            <Button
+                                type="link"
+                                icon={<MdOutlineEdit size={20} />}
+                                onClick={() => {
+                                    setTeacherSelected(item);
+                                    setVisible(true);
+                                }}
+                            />
+                        </Tooltip>
                     </Space>
                 </>);
             }
         }
     ];
-
     return (
         <>
             <Table
@@ -124,7 +135,11 @@ const TeacherPage = () => {
                                 </div>
 
                                 <div className="col text-end">
-                                    <Button type="primary" onClick={() => { setVisible(true) }}><IoIosAdd size={20} />Thêm</Button>
+                                    <Button
+                                        type="primary"
+                                        onClick={() => { setVisible(true) }}
+                                    >
+                                        <IoIosAdd size={20} />Thêm</Button>
                                 </div>
                             </div >
                         </>
@@ -138,8 +153,12 @@ const TeacherPage = () => {
 
             <ToggleModal
                 visible={visible}
-                setVisible={setVisible}
                 loadData={loadData}
+                teacherSelected={teacherSelected}
+                onClose={() => {
+                    setVisible(false);
+                    setTeacherSelected(undefined);
+                }}
             />
         </>
     );

@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useState } from "react";
 import { auth } from "../../../firebase/firebaseConfig";
-import HandelAPI from "../../../api/handleAPI";
+import handelAPI from "../../../api/handleAPI";
 import { addAuth } from "../../../redux/reducers/authReducer";
 
 const provider = new GoogleAuthProvider();
@@ -28,7 +28,7 @@ const SocialLogin = () => {
                     }
                     const api = "auth/google-login";
                     try {
-                        const res = await HandelAPI(api, data, "post");
+                        const res = await handelAPI(api, data, "post");
                         if (res.data) {
                             dispatch(addAuth(res.data));
                         } else {

@@ -2,7 +2,7 @@ import { Button, Card, Checkbox, Form, Input, message, notification, Space, Typo
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
-import HandelAPI from "../../api/handleAPI";
+import handelAPI from "../../api/handleAPI";
 import { useDispatch } from "react-redux";
 import { addAuth } from "../../redux/reducers/authReducer";
 import { auth } from "../../firebase/firebaseConfig";
@@ -23,7 +23,7 @@ const Login = () => {
             email: values.email,
             password: values.password
         }
-        const res = await HandelAPI(api, data, 'post');
+        const res = await handelAPI(api, data, 'post');
         if (res.data) {
             dispatch(addAuth(res.data));
             message.success("Login Success");

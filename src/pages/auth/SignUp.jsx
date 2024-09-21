@@ -2,7 +2,7 @@ import { Button, Card, Form, Input, notification, Space, Typography } from "antd
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
-import HandelAPI from "../../api/handleAPI";
+import handelAPI from "../../api/handleAPI";
 
 const { Title, Paragraph, Text } = Typography
 
@@ -21,7 +21,7 @@ const SignUp = () => {
       password: values.password,
       confirmPassword: values.confirmPassword
     }
-    const res = await HandelAPI(api, data, "post");
+    const res = await handelAPI(api, data, "post");
     if (res.data) {
       notification.success({
         message: "Register success",
