@@ -15,7 +15,7 @@ const MainRouter = () => {
                     <SiderComponent />
                     <Layout>
                         <HeaderComponent />
-                        <Content >
+                        <Content className="mt-3 mb-3 container bg-white">
                             <Routes>
                                 <Route path="/" element={<HomePage />} />
                                 <Route path="/teacher" element={<TeacherPage />} />
@@ -23,7 +23,7 @@ const MainRouter = () => {
                                 <Route path="/class" element={<ClassPage />} />
                             </Routes>
                         </Content>
-                        <Footer />
+
                     </Layout>
                 </Layout>
             </BrowserRouter>
