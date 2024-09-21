@@ -30,6 +30,28 @@ const TeacherPage = () => {
         }
     }
 
+    const handleDeleteTeacher = async (id) => {
+        const api = `/teachers/delete/${id}`;
+        try {
+            const res = await handelAPI(api, "", "delete");
+            if (res.data) {
+                loadData();
+                notification.success({
+                    message: res.message,
+                    description: "Xoá giáo viên thành công"
+                })
+            } else {
+                notification.error({
+                    message: "Delete Error",
+                    description: res.message,
+                })
+            }
+        } catch (error) {
+            console.log(error);
+        }
+
+    }
+
     const columns = [
         {
             title: 'STT',
@@ -85,33 +107,22 @@ const TeacherPage = () => {
             fixed: "right",
             render: (item) => {
                 return (<>
-
                     <Space>
+                        <Tooltip title="Edit" color="#2db7f5">
+                            <Button
+                                type="link"
+                                icon={<MdOutlineEdit size={20} />}
+                                onClick={() => {
+                                    setTeacherSelected(item);
+                                    setVisible(true);
+                                }}
+                            />
+                        </Tooltip>
                         <Popconfirm
                             placement="right"
                             title="Xoá giáo viên"
                             description="Bạn chắc chắn xoá giáo viên này không"
-                            onConfirm={async () => {
-                                const api = `/teachers/delete/${item._id}`;
-                                try {
-                                    const res = await handelAPI(api, "", "delete");
-                                    if (res.data) {
-                                        loadData();
-                                        notification.success({
-                                            message: res.message,
-                                            description: "Xoá giáo viên thành công"
-                                        })
-                                    } else {
-                                        notification.error({
-                                            message: "Delete Error",
-                                            description: res.message,
-                                        })
-                                    }
-                                } catch (error) {
-                                    console.log(error);
-                                }
-
-                            }}
+                            onConfirm={() => handleDeleteTeacher(item._id)}
                             onCancel={""}
                             okText="Yes"
                             cancelText="No"
@@ -123,16 +134,6 @@ const TeacherPage = () => {
                                 danger
                             />
                         </Popconfirm>
-                        <Tooltip title="Edit" color="#2db7f5">
-                            <Button
-                                type="link"
-                                icon={<MdOutlineEdit size={20} />}
-                                onClick={() => {
-                                    setTeacherSelected(item);
-                                    setVisible(true);
-                                }}
-                            />
-                        </Tooltip>
                     </Space>
                 </>);
             }
