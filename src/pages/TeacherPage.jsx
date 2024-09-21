@@ -12,22 +12,46 @@ const TeacherPage = () => {
     const [visible, setVisible] = useState(false);
     const [dataSource, setDataSource] = useState([]);
     const [teacherSelected, setTeacherSelected] = useState();
+    const [current, setCurrent] = useState(1);
+    const [pageSize, setPageSize] = useState(5);
+    const [total, setTotal] = useState(0);
+    const [status, setStatus] = useState("");
+
     useEffect(() => {
         loadData();
-    }, []);
+    }, [current, pageSize, status]);
 
     const loadData = async () => {
         setIsLoading(true);
-        const api = `/teachers`;
+        const api = `/teachers?current=${current}&&pageSize=${pageSize}&&status=${status}`;
         try {
             const res = await handelAPI(api);
 
-            res.data && setDataSource(res.data);
+            if (res.data) {
+                setDataSource(res.data);
+                setCurrent(res.meta.current);
+                setPageSize(res.meta.pageSize);
+                setTotal(res.meta.total);
+            }
         } catch (error) {
             console.log(error);
         } finally {
             setIsLoading(false);
         }
+    }
+
+    const onChangeTable = (pagination, filters, sorter, extra) => {
+        if (pagination.current && pagination.current !== current) {
+            setCurrent(pagination.current);
+        }
+        if (pagination.pageSize && pagination.pageSize !== pageSize) {
+            setPageSize(pagination.pageSize);
+        }
+    }
+
+    const onChangeStatus = (event) => {
+        setStatus(event.target.value);
+        setCurrent(1);
     }
 
     const handleDeleteTeacher = async (id) => {
@@ -56,7 +80,7 @@ const TeacherPage = () => {
         {
             title: 'STT',
             render: (_, record, index) => {
-                return index + 1;
+                return (index + 1) + (current - 1) * pageSize;
             }
         },
         {
@@ -152,8 +176,8 @@ const TeacherPage = () => {
                                 </div>
 
                                 <div className="col text-center">
-                                    <Radio.Group onChange={""} defaultValue={"all"} buttonStyle="solid">
-                                        <Radio.Button value={"all"}>Tất cả</Radio.Button>
+                                    <Radio.Group onChange={(event) => onChangeStatus(event)} defaultValue={status} buttonStyle="solid">
+                                        <Radio.Button value={""}>Tất cả</Radio.Button>
                                         <Radio.Button value={"active"}>Đang công tác</Radio.Button>
                                         <Radio.Button value={"inactive"}>Ngừng công tác</Radio.Button>
                                     </Radio.Group>
@@ -172,7 +196,16 @@ const TeacherPage = () => {
                 }}
                 columns={columns}
                 dataSource={dataSource}
-                pagination={{}}
+                pagination={{
+                    current: current,
+                    pageSize: pageSize,
+                    total: total,
+                    position: ["bottomCenter"],
+                    showSizeChanger: true,
+                    pageSizeOptions: [5, 10, 20, 50],
+                    showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} rows</div>) }
+                }}
+                onChange={onChangeTable}
                 rowKey="_id"
             />
 

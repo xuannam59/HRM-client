@@ -66,9 +66,6 @@ const ToggleModal = (props) => {
                     message: "Error",
                     description: res.message
                 });
-                form.setFieldsValue({
-                    password: ""
-                })
             }
         } catch (error) {
             console.log(error);
