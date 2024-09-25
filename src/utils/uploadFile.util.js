@@ -1,5 +1,5 @@
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { replaceName } from "./replaceName"
+import { replaceName } from "./replaceName.util"
 import { storage } from "../firebase/firebaseConfig";
 
 

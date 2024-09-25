@@ -1,14 +1,16 @@
-import { Avatar, Form, Input, Modal, notification, Radio, Select } from "antd";
+import { Avatar, DatePicker, Form, Input, InputNumber, Modal, notification, Radio, Select } from "antd";
 import { useEffect, useState } from "react";
 import handleApi from "../api/handleAPI";
-import { uploadFile } from "../utils/uploadFile";
-import { replaceName } from "../utils/replaceName";
+import { uploadFile } from "../utils/uploadFile.util";
+import { replaceName } from "../utils/replaceName.util";
+import moment from 'moment';
 
+const { TextArea } = Input;
 
 const ToggleModal = (props) => {
     const { loadData,
         visible, onClose,
-        teacherSelected
+        employeeSelected
     } = props
     const [isLoading, setIsLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState(undefined);
@@ -16,11 +18,14 @@ const ToggleModal = (props) => {
     const [form] = Form.useForm();
 
     useEffect(() => {
-        if (teacherSelected) {
-            setPreview(teacherSelected.avatar);
-            form.setFieldsValue(teacherSelected);
+        if (employeeSelected) {
+            employeeSelected.birthday = moment(employeeSelected.birthday);
+            employeeSelected.createdAt = moment(employeeSelected.createdAt);
+            employeeSelected.updatedAt = moment(employeeSelected.updatedAt);
+            setPreview(employeeSelected.avatar);
+            form.setFieldsValue(employeeSelected);
         }
-    }, [teacherSelected]);
+    }, [employeeSelected]);
     const handleCancel = () => {
         form.resetFields();
         setSelectedFile(undefined);
@@ -43,18 +48,18 @@ const ToggleModal = (props) => {
     const onFinish = async (values) => {
         setIsLoading(true);
         const data = values;
-        const api = `/teachers/${teacherSelected ? `update/${teacherSelected._id}` : "create"}`;
-
+        const api = `/employees/${employeeSelected ? `update/${employeeSelected._id}` : "create"}`;
+        data.birthday = moment(data.birthday.$d).format();
         if (selectedFile && preview) {
             data.avatar = await uploadFile(selectedFile);
         }
         data.slug = replaceName(values.fullName);
         try {
-            const res = await handleApi(api, data, `${teacherSelected ? "put" : "post"}`);
+            const res = await handleApi(api, data, `${employeeSelected ? "put" : "post"}`);
             if (res.data) {
                 handleCancel();
                 loadData();
-                notification.success(teacherSelected ? {
+                notification.success(employeeSelected ? {
                     message: "Updata Susseccfully",
                     description: "Cập nhập giáo viên thành công"
                 } : {
@@ -77,11 +82,11 @@ const ToggleModal = (props) => {
         <>
             <Modal
                 closable={!isLoading}
-                title={teacherSelected ? "Update Teacher" : "Create Teacher"}
+                title={employeeSelected ? "Update Employee" : "Create Employee"}
                 open={visible}
                 onCancel={handleCancel}
                 onOk={() => form.submit()}
-                okText={teacherSelected ? "UPDATE" : "CREATE"}
+                okText={employeeSelected ? "UPDATE" : "CREATE"}
                 okButtonProps={{
                     loading: isLoading
                 }}
@@ -115,50 +120,35 @@ const ToggleModal = (props) => {
                             }}>Upload</label>
                         </div>
                     </div>
-                    <Form.Item
-                        name={"fullName"}
-                        label="Họ tên"
-                        rules={[
-                            {
-                                required: true,
-                                message: "Vui lòng nhập họ tên!"
-                            }
-                        ]}
-                    >
-
-                        <Input placeholder="Full Name" />
-                    </Form.Item>
 
                     <div className="row">
                         <div className="col-6">
                             <Form.Item
-                                name={"email"}
-                                label="Email"
+                                name={"fullName"}
+                                label="Họ tên"
                                 rules={[
                                     {
                                         required: true,
-                                        message: "Vui lòng nhập email!"
-                                    },
-                                    {
-                                        type: "email",
-                                        message: "Email không đúng định dạng!"
+                                        message: "Vui lòng nhập họ tên!"
                                     }
                                 ]}
                             >
-
-                                <Input placeholder="Email" />
+                                <Input placeholder="Full Name" />
+                            </Form.Item>
+                        </div>
+                        <div className="col-3">
+                            <Form.Item
+                                name="birthday"
+                                label="Ngày sinh"
+                            >
+                                <DatePicker
+                                    format={"DD/MM/YYYY"} />
                             </Form.Item>
                         </div>
                         <div className="col-3">
                             <Form.Item
                                 name={"gender"}
                                 label="Giới tính"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "Vui lòng chọn giới tính!"
-                                    }
-                                ]}
                             >
                                 <Select
                                     placeholder={"Giới tính"}
@@ -178,55 +168,25 @@ const ToggleModal = (props) => {
                                     ]} />
                             </Form.Item>
                         </div>
-                        <div className="col-3">
-                            <Form.Item
-                                name={"class"}
-                                label="Chủ nhiệm"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "Vui lòng nhập lớp"
-                                    }
-                                ]}
-                            >
-                                <Select
-                                    placeholder={"Lớp"}
-                                    options={[
-                                        {
-                                            value: '6A',
-                                            label: 'Lớp 6A'
-                                        },
-                                        {
-                                            value: '6B',
-                                            label: 'Lớp 6B'
-                                        },
-                                        {
-                                            value: '6C',
-                                            label: 'Lớp 6C'
-                                        },
-                                    ]} />
-                            </Form.Item>
-                        </div>
                     </div>
 
                     <div className="row">
-                        <div className="col">
+                        <div className="col-3 pe-0">
                             <Form.Item
-                                name={"password"}
-                                label="Mật khẩu"
+                                name={"passport"}
+                                label="CCCD"
                                 rules={[
-                                    (teacherSelected ? {} :
-                                        {
-                                            required: true,
-                                            message: "Vui lòng nhập mật khẩu"
-                                        }
-                                    )
+                                    {
+                                        required: true,
+                                        message: "Vui lòng nhập căng cước công dân!"
+                                    }
                                 ]}
                             >
-                                <Input.Password placeholder="Password" />
+
+                                <Input placeholder="CCCD" />
                             </Form.Item>
                         </div>
-                        <div className="col">
+                        <div className="col-4 pe-0">
                             <Form.Item
                                 name={"phoneNumber"}
                                 label="Số điện thoại"
@@ -237,38 +197,86 @@ const ToggleModal = (props) => {
                                     },
                                 ]}
                             >
-                                <Input placeholder="Số điện thoại" />
+                                <Input
+                                    addonBefore={"+84"}
+                                    placeholder="Số điện thoại"
+                                />
                             </Form.Item>
                         </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-6">
+                        <div className="col-5">
                             <Form.Item
-                                name={"subject"}
-                                label="Chuyên môn"
+                                name={"email"}
+                                label="Email"
                                 rules={[
                                     {
                                         required: true,
-                                        message: "Vui lòng chọn Môn dạy"
+                                        message: "Vui lòng nhập email!"
+                                    },
+                                    {
+                                        type: "email",
+                                        message: "Email không đúng định dạng!"
                                     }
                                 ]}
                             >
+                                <Input placeholder="Email" />
+                            </Form.Item>
+                        </div>
+                    </div>
+
+                    <div className="row">
+                        <div className="col">
+                            <Form.Item
+                                name={"address"}
+                                label="Địa chỉ"
+                            >
+                                <TextArea rows={4} placeholder="Địa chỉ" />
+                            </Form.Item>
+                        </div>
+                        <div className="col">
+                            <Form.Item
+                                style={{ marginBottom: 0 }}
+                                name={"y"}
+                                label="Phòng ban"
+                            >
                                 <Select
-                                    placeholder={"Lớp"}
                                     options={[
                                         {
-                                            value: 'Toán',
-                                            label: 'Toán'
+                                            value: "a",
+                                            label: "Kế toán"
                                         },
                                         {
-                                            value: 'Văn',
-                                            label: 'Văn'
+                                            value: "vicedirector",
+                                            label: "Lập trình"
                                         },
                                         {
-                                            value: 'Anh',
-                                            label: 'Anh'
+                                            value: "employee",
+                                            label: "Nhân sự"
                                         },
-                                    ]} />
+                                    ]}
+                                    placeholder="Bộ phận"
+                                />
+                            </Form.Item>
+                            <Form.Item
+                                name={"x"}
+                                label="Chức vụ"
+                            >
+                                <Select
+                                    options={[
+                                        {
+                                            value: "director",
+                                            label: "Giám đốc"
+                                        },
+                                        {
+                                            value: "vicedirector",
+                                            label: "Phó giám đốc"
+                                        },
+                                        {
+                                            value: "employee",
+                                            label: "nhân viên"
+                                        },
+                                    ]}
+                                    placeholder="Chức vụ"
+                                />
                             </Form.Item>
                         </div>
                     </div>
@@ -277,10 +285,38 @@ const ToggleModal = (props) => {
                         label="Trạng thái"
                     >
                         <Radio.Group optionType="button" buttonStyle="solid" value={"active"}>
-                            <Radio value={"active"} >Đang công tác</Radio>
-                            <Radio value={"inactive"}>Ngừng công tác</Radio>
+                            <Radio value={"active"} >Làm việc</Radio>
+                            <Radio value={"inactive"}>Nghỉ việc</Radio>
                         </Radio.Group>
                     </Form.Item>
+                    {employeeSelected &&
+                        <div className="row">
+                            <div className="col">
+                                <Form.Item
+                                    name="createdAt"
+                                    label="Khởi tạo"
+                                >
+                                    <DatePicker format={"DD/MM/YYYY"} disabled />
+                                </Form.Item>
+                            </div>
+                            <div className="col">
+                                <Form.Item
+                                    name="updatedAt"
+                                    label="Cập nhật"
+                                >
+                                    <DatePicker format={"DD/MM/YYYY"} disabled />
+                                </Form.Item>
+                            </div>
+                            <div className="col">
+                                <Form.Item
+                                    name="createBy"
+                                    label="Tạo bởi"
+                                >
+                                    <Input disabled />
+                                </Form.Item>
+                            </div>
+                        </div>
+                    }
                 </Form>
                 <input type="file" accept="image/*" id="uploadImage"
                     onChange={(event) => onSelectFile(event)}

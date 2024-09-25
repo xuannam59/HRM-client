@@ -27,7 +27,7 @@ const SignUp = () => {
         message: "Register success",
         description: "Account created successfully"
       });
-      navigate("/");
+      navigate("/login");
     } else {
       notification.error({
         message: "Register error",

@@ -5,10 +5,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { authSelector, removeAuth } from "../redux/reducers/authReducer";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase/firebaseConfig";
+import { useNavigate } from "react-router-dom";
 
 const HeaderComponent = () => {
     const user = useSelector(authSelector);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const items = [
         {
             key: 'logout',
@@ -16,13 +18,14 @@ const HeaderComponent = () => {
             onClick: async () => {
                 signOut(auth);
                 dispatch(removeAuth({}));
+                navigate("/login");
             }
         }
     ];
 
     return (<>
         <div className="row bg-white gx-0 align-items-center"
-            style={{ height: "80px" }}>
+            style={{ height: "80px", width: "100%" }}>
             <div className="col text-center">
                 <Input
                     style={{

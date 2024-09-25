@@ -1,9 +1,10 @@
 import { useSelector } from "react-redux";
 import { authSelector } from "../redux/reducers/authReducer";
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { Affix, Layout } from "antd";
 import { HeaderComponent, SiderComponent } from "../components";
-import { ClassPage, HomePage, StudentPage, TeacherPage } from "../pages";
+import { ClassPage, HomePage, StudentPage, EmployeePage, ErrorPage } from "../pages";
+import EmployeeDetailComponent from "../components/EmployeeDetailComponent";
 
 const { Header, Sider, Content, Footer } = Layout;
 
@@ -15,15 +16,18 @@ const MainRouter = () => {
                     <SiderComponent />
                     <Layout>
                         <HeaderComponent />
-                        <Content className="mt-3 mb-3 container bg-white">
+                        <Content className="mt-3 mb-3 container bg-white rounded-3">
                             <Routes>
-                                <Route path="/" element={<HomePage />} />
-                                <Route path="/teacher" element={<TeacherPage />} />
+                                <Route path="/login" element={<Navigate to="/dashboard" />} />
+                                <Route path="/dashboard" element={<HomePage />} />
+                                <Route path="/employee" element={<EmployeePage />} />
+                                <Route path="/employee/detail/:id" element={<EmployeeDetailComponent />} />
                                 <Route path="/student" element={<StudentPage />} />
                                 <Route path="/class" element={<ClassPage />} />
+                                <Route path="*" element={<Navigate to="/404" />} />
+                                <Route path="/404" element={<ErrorPage />} />
                             </Routes>
                         </Content>
-
                     </Layout>
                 </Layout>
             </BrowserRouter>

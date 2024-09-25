@@ -1,17 +1,20 @@
-import { Button, notification, Popconfirm, Radio, Space, Table, Tag, Tooltip, Typography } from "antd";
+import { Avatar, Button, notification, Popconfirm, Radio, Space, Table, Tag, Tooltip, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { IoIosAdd } from "react-icons/io";
 import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
 import ToggleModal from "../modals/ToggleModal";
 import handelAPI from "../api/handleAPI";
+import { Link } from "react-router-dom";
+import { FiDownload } from "react-icons/fi";
+import { exportExcel } from "../utils/exportExcel.util";
 
 const { Title } = Typography;
 
-const TeacherPage = () => {
+const EmployeePage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [visible, setVisible] = useState(false);
     const [dataSource, setDataSource] = useState([]);
-    const [teacherSelected, setTeacherSelected] = useState();
+    const [employeeSelected, setEmployeeSelected] = useState();
     const [current, setCurrent] = useState(1);
     const [pageSize, setPageSize] = useState(5);
     const [total, setTotal] = useState(0);
@@ -23,7 +26,7 @@ const TeacherPage = () => {
 
     const loadData = async () => {
         setIsLoading(true);
-        const api = `/teachers?current=${current}&&pageSize=${pageSize}&&status=${status}`;
+        const api = `/employees?current=${current}&&pageSize=${pageSize}&&status=${status}`;
         try {
             const res = await handelAPI(api);
 
@@ -54,8 +57,8 @@ const TeacherPage = () => {
         setCurrent(1);
     }
 
-    const handleDeleteTeacher = async (id) => {
-        const api = `/teachers/delete/${id}`;
+    const handleDeleteEmployee = async (id) => {
+        const api = `/employees/delete/${id}`;
         try {
             const res = await handelAPI(api, "", "delete");
             if (res.data) {
@@ -73,7 +76,6 @@ const TeacherPage = () => {
         } catch (error) {
             console.log(error);
         }
-
     }
 
     const columns = [
@@ -84,20 +86,40 @@ const TeacherPage = () => {
             }
         },
         {
+            title: "Avatar",
+            render: (item, record) => {
+                return (
+                    <>
+                        <Avatar src={item.avatar} size={50} />
+                    </>
+                )
+            }
+        },
+        {
             title: 'Họ tên',
-            dataIndex: 'fullName',
+            render: (item) => {
+                return (
+                    <>
+                        <Link to={`/employee/detail/${item._id}`} >{item.fullName}</Link>
+                    </>
+                );
+            }
         },
         {
-            title: 'Môn dạy',
-            dataIndex: 'subject',
+            title: "Phòng ban",
+            dataIndex: "x"
         },
         {
-            title: "Lớp",
-            dataIndex: "class"
+            title: "Chức vụ",
+            dataIndex: "y"
         },
         {
             title: "Email",
             dataIndex: "email"
+        },
+        {
+            title: "Số điện thoại",
+            dataIndex: "phoneNumber"
         },
         {
             title: "Giới tính",
@@ -111,15 +133,15 @@ const TeacherPage = () => {
                 switch (record.status) {
                     case "active":
                         color = "green";
-                        status = "Đang công tác"
+                        status = "Làm việc"
                         break
                     case "inactive":
                         color = "red";
-                        status = "Ngừng công tác";
+                        status = "Nghỉ việc";
                         break
                     default:
                         color = "#f50";
-                        status = "Chưa cập nhập";
+                        status = "Updating";
                 }
                 return (
                     <Tag color={color}>{status}</Tag>
@@ -137,7 +159,7 @@ const TeacherPage = () => {
                                 type="link"
                                 icon={<MdOutlineEdit size={20} />}
                                 onClick={() => {
-                                    setTeacherSelected(item);
+                                    setEmployeeSelected(item);
                                     setVisible(true);
                                 }}
                             />
@@ -145,8 +167,8 @@ const TeacherPage = () => {
                         <Popconfirm
                             placement="right"
                             title="Xoá giáo viên"
-                            description="Bạn chắc chắn xoá giáo viên này không"
-                            onConfirm={() => handleDeleteTeacher(item._id)}
+                            description="Bạn chắc chắn xoá nhân viên này không"
+                            onConfirm={() => handleDeleteEmployee(item._id)}
                             onCancel={""}
                             okText="Yes"
                             cancelText="No"
@@ -163,37 +185,47 @@ const TeacherPage = () => {
             }
         }
     ];
+
+    const handleExportExcel = async () => {
+        const api = `/employees/all`;
+        try {
+            const res = await handelAPI(api);
+            if (res.data) {
+                const data = res.data;
+                delete data.passport;
+                exportExcel(data);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
     return (
         <>
+            <div className="row m-3">
+                <div className="col text-left">
+                    <Title level={4}>List Employee</Title>
+                </div>
+
+                <div className="col text-center">
+                    <Radio.Group onChange={(event) => onChangeStatus(event)} defaultValue={status} buttonStyle="solid">
+                        <Radio.Button value={""}>Tất cả</Radio.Button>
+                        <Radio.Button value={"active"}>Đang công tác</Radio.Button>
+                        <Radio.Button value={"inactive"}>Ngừng công tác</Radio.Button>
+                    </Radio.Group>
+                </div>
+
+                <div className="col text-end">
+                    <Button
+                        type="primary"
+                        onClick={() => { setVisible(true) }}
+                        icon={<IoIosAdd size={20} />}
+                    >
+                        Thêm</Button>
+                    <Button className="ms-2" icon={<FiDownload />} onClick={handleExportExcel}>Xuất excel</Button>
+                </div>
+            </div >
             <Table
                 loading={isLoading}
-                title={() => {
-                    return (
-                        <>
-                            <div className="row">
-                                <div className="col text-left">
-                                    <Title level={4}>List teacher</Title>
-                                </div>
-
-                                <div className="col text-center">
-                                    <Radio.Group onChange={(event) => onChangeStatus(event)} defaultValue={status} buttonStyle="solid">
-                                        <Radio.Button value={""}>Tất cả</Radio.Button>
-                                        <Radio.Button value={"active"}>Đang công tác</Radio.Button>
-                                        <Radio.Button value={"inactive"}>Ngừng công tác</Radio.Button>
-                                    </Radio.Group>
-                                </div>
-
-                                <div className="col text-end">
-                                    <Button
-                                        type="primary"
-                                        onClick={() => { setVisible(true) }}
-                                    >
-                                        <IoIosAdd size={20} />Thêm</Button>
-                                </div>
-                            </div >
-                        </>
-                    );
-                }}
                 columns={columns}
                 dataSource={dataSource}
                 pagination={{
@@ -205,6 +237,9 @@ const TeacherPage = () => {
                     pageSizeOptions: [5, 10, 20, 50],
                     showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} rows</div>) }
                 }}
+                scroll={{
+                    x: 'max-content'
+                }}
                 onChange={onChangeTable}
                 rowKey="_id"
             />
@@ -212,14 +247,14 @@ const TeacherPage = () => {
             <ToggleModal
                 visible={visible}
                 loadData={loadData}
-                teacherSelected={teacherSelected}
+                employeeSelected={employeeSelected}
                 onClose={() => {
                     setVisible(false);
-                    setTeacherSelected(undefined);
+                    setEmployeeSelected(undefined);
                 }}
             />
         </>
     );
 }
 
-export default TeacherPage;
+export default EmployeePage;

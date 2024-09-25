@@ -25,6 +25,7 @@ const Login = () => {
         }
         const res = await handelAPI(api, data, 'post');
         if (res.data) {
+
             dispatch(addAuth(res.data));
             message.success("Login Success");
         } else {

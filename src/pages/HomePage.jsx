@@ -5,8 +5,8 @@ import handleApi from "../api/handleAPI";
 
 const HomePage = () => {
     // lấy dữ liệu nếu mà token k đúng thì k có quyền và nếu token hết hạn thì xét lại 
-    // const getTeacher = async () => {
-    //     const api = 'school/teachers';
+    // const getEmployee= async () => {
+    //     const api = 'school/employees';
 
     //     const res = await handleApi(api);
     //     if (res.data) {
@@ -16,7 +16,7 @@ const HomePage = () => {
     //         console.log(res);
     //         if (res.message !== "jwt expired") {
     //             notification.error({
-    //                 message: "Error data teacher",
+    //                 message: "Error data employee",
     //                 description: "Không lấy được đữ liệu"
     //             });
     //         }

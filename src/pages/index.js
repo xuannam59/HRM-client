@@ -1,9 +1,10 @@
 import Login from "./auth/Login"
 import SignUp from "./auth/SignUp"
 import HomePage from "./HomePage"
-import TeacherPage from "./TeacherPage"
+import EmployeePage from "./EmployeePage"
 import StudentPage from "./StudentPage"
 import ClassPage from "./ClassPage"
+import ErrorPage from "./ErrorPage"
 
 
 export {
@@ -11,6 +12,7 @@ export {
   SignUp,
   HomePage,
   ClassPage,
-  TeacherPage,
-  StudentPage
+  EmployeePage,
+  StudentPage,
+  ErrorPage
 }
