@@ -58,7 +58,6 @@ const PositionPage = () => {
         }
     }
 
-
     const handleDeleteEmployee = async (id) => {
         const api = `/positions/delete/${id}`;
         try {
@@ -100,11 +99,13 @@ const PositionPage = () => {
             dataIndex: "index",
             render: (text, record, index) => {
                 return (index + 1) + (current - 1) * pageSize;
-            }
+            },
+            width: 'max-content'
         },
         {
             title: 'Mã Chức vụ',
             dataIndex: "_id",
+            width: "mã"
         },
         {
             title: 'Tên Chức vụ',
@@ -116,11 +117,12 @@ const PositionPage = () => {
             render: (text, record, index, action) => {
                 if (text)
                     return text.toLocaleString('it-IT', { style: 'currency', currency: 'VND' })
-            }
+            },
         },
         {
             title: 'Mô tả',
-            dataIndex: "description"
+            dataIndex: "description",
+            width: 250
         },
         {
             title: 'Ngày tạo',
@@ -199,9 +201,9 @@ const PositionPage = () => {
                     pageSizeOptions: [5, 10, 20, 50],
                     showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} rows</div>) }
                 }}
-                scroll={{
-                    x: 'max-content'
-                }}
+                scroll={
+                    { x: 'max-content' }
+                }
                 onChange={onChangeTable}
                 rowKey="_id"
             />
