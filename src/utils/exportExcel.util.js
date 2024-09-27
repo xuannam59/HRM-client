@@ -5,5 +5,5 @@ export const exportExcel = (data, fielName) => {
     const workbook = utils.book_new();
 
     utils.book_append_sheet(workbook, worksheet, 'data');
-    writeFileXLSX(workbook, `${fielName ? fielName : `list-employee-${Date.now()}`}.xlsx`);
+    writeFileXLSX(workbook, `${fielName ? fielName : `data-${Date.now()}`}.xlsx`);
 };

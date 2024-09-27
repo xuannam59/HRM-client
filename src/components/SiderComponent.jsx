@@ -1,6 +1,10 @@
 import { Layout, Menu, Typography } from "antd";
 import { FiHome } from "react-icons/fi";
 import { PiUsersThree } from "react-icons/pi";
+import { FaRegUser } from "react-icons/fa";
+import { LuGraduationCap, LuUserCog2 } from "react-icons/lu";
+import { LiaUserTieSolid } from "react-icons/lia";
+import { TbCertificate } from "react-icons/tb";
 import { appInfo } from "../constants/appInfos"
 
 import { Link, useLocation } from "react-router-dom";
@@ -13,7 +17,7 @@ const SiderComponent = () => {
     let location = useLocation();
     useEffect(() => {
         if (location && location.pathname) {
-            const allRoute = ["dashboard", "employee", 'student', 'class',];
+            const allRoute = ["dashboard", "employee", 'student', 'class', "position", "level"];
             const currentRoute = allRoute.find((item) => location.pathname.split("/")[1] === item);
             if (currentRoute) {
                 setCurrent(currentRoute);
@@ -30,13 +34,39 @@ const SiderComponent = () => {
     const items = [
         {
             key: 'dashboard',
-            label: <Link to={"/dashboard"}>Dashboard</Link>,
+            label: <Link to={"/dashboard"}>Tổng quan</Link>,
             icon: <FiHome size={20} />
         },
         {
-            key: "employee",
-            label: <Link to={"/employee"}>Employee</Link>,
-            icon: <PiUsersThree size={20} />
+            label: " Management Employee",
+            icon: <PiUsersThree size={25} />,
+            children: [
+                {
+                    key: "employee",
+                    label: <Link to={"/employee"}>Nhân viên</Link>,
+                    icon: <FaRegUser size={18} />,
+                },
+                {
+                    key: "position",
+                    label: <Link to={"/position"}>Chức vụ</Link>,
+                    icon: <LiaUserTieSolid size={20} />,
+                },
+                {
+                    key: "level",
+                    label: <Link to={"/level"}>Trình độ</Link>,
+                    icon: <LuGraduationCap size={20} />,
+                },
+                {
+                    key: "expertise",
+                    label: <Link to={"/"}>Chuyên môn</Link>,
+                    icon: <LuUserCog2 size={20} />,
+                },
+                {
+                    key: "certificate",
+                    label: <Link to={"/"}>Bằng cấp</Link>,
+                    icon: <TbCertificate size={20} />,
+                },
+            ]
         },
     ];
     return (
