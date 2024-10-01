@@ -5,10 +5,10 @@ import { useSelector } from "react-redux";
 import { authSelector } from "../redux/reducers/authReducer";
 import handleApi from "../api/handleAPI";
 
-const ToggleModalPosition = (props) => {
+const ToggleModalSpecialize = (props) => {
     const {
         visible,
-        loadData, positionSelected, onClose
+        loadData, specializeSelected, onClose
     } = props
     const [isLoading, setIsLoading] = useState(false);
 
@@ -16,26 +16,26 @@ const ToggleModalPosition = (props) => {
 
     const [form] = Form.useForm();
     useEffect(() => {
-        if (positionSelected) {
-            form.setFieldsValue(positionSelected);
+        if (specializeSelected) {
+            form.setFieldsValue(specializeSelected);
         }
-    }, [positionSelected]);
+    }, [specializeSelected]);
 
     const onFinish = async (values) => {
         setIsLoading(true);
-        const api = `/positions/${positionSelected ? `update/${positionSelected._id}` : "create"}`;
+        const api = `/specializes/${specializeSelected ? `update/${specializeSelected._id}` : "create"}`;
         try {
-            const res = await handleApi(api, values, `${positionSelected ? "put" : "post"}`);
+            const res = await handleApi(api, values, `${specializeSelected ? "put" : "post"}`);
             if (res.data) {
                 loadData();
                 handleCancel();
-                notification.success(positionSelected ?
+                notification.success(specializeSelected ?
                     {
                         message: "Update success",
-                        description: "Cập nhập chức vụ thánh công"
+                        description: "Cập nhập chuyên môn thánh công"
                     } : {
                         message: "Create success",
-                        description: "Tạo chức vụ thánh công"
+                        description: "Tạo chuyên môn thánh công"
                     });
             } else {
                 notification.error({
@@ -58,11 +58,11 @@ const ToggleModalPosition = (props) => {
     return (<>
         <Modal
             closable={!isLoading}
-            title={positionSelected ? "Update position" : "Create position"}
+            title={specializeSelected ? "Update specialize" : "Create specialize"}
             open={visible}
             onCancel={handleCancel}
             onOk={() => form.submit()}
-            okText={positionSelected ? "UPDATE" : "CREATE"}
+            okText={specializeSelected ? "UPDATE" : "CREATE"}
             okButtonProps={{
                 loading: isLoading
             }}
@@ -81,38 +81,19 @@ const ToggleModalPosition = (props) => {
                     ["createdBy"]: user._id
                 }}
             >
-                <div className="row">
-                    <div className="col">
-                        <Form.Item
-                            name={"title"}
-                            label={"Tên chức vụ"}
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Vui không được để trống!"
-                                }
-                            ]}
-                        >
+                <Form.Item
+                    name={"title"}
+                    label={"Tên chuyên môn"}
+                    rules={[
+                        {
+                            required: true,
+                            message: "Vui không được để trống!"
+                        }
+                    ]}
+                >
 
-                            <Input placeholder="Tên chức vụ" />
-                        </Form.Item>
-                    </div>
-                    <div className="col">
-                        <Form.Item
-                            name={"salary"}
-                            label={"Lương ngày"}
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Vui không được để trống!"
-                                }
-                            ]}
-                        >
-
-                            <InputNumber placeholder="Lương" style={{ width: "100%" }} />
-                        </Form.Item>
-                    </div>
-                </div>
+                    <Input placeholder="Tên chuyên môn" />
+                </Form.Item>
                 <Form.Item
                     name={"description"}
                     label={"Mô tả"}
@@ -136,7 +117,7 @@ const ToggleModalPosition = (props) => {
                     </div>
                     <div className="col">
                         <Form.Item
-                            label={positionSelected ? "Ngày cập nhập" : "Ngày tạo"}
+                            label={specializeSelected ? "Ngày cập nhập" : "Ngày tạo"}
                         >
 
                             <DatePicker format={"DD/MM/YYYY"} defaultValue={moment()} disabled />
@@ -149,4 +130,4 @@ const ToggleModalPosition = (props) => {
     </>);
 }
 
-export default ToggleModalPosition;
+export default ToggleModalSpecialize;

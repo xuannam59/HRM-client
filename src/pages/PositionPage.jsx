@@ -129,6 +129,10 @@ const PositionPage = () => {
             dataIndex: "createdAt"
         },
         {
+            title: 'Người tạo',
+            dataIndex: "infoCreatedBy"
+        },
+        {
             title: 'Ngày sửa',
             dataIndex: "updatedAt"
         },
@@ -151,7 +155,7 @@ const PositionPage = () => {
                         <Popconfirm
                             placement="right"
                             title="Xoá giáo viên"
-                            description="Bạn chắc chắn xoá nhân viên này không"
+                            description="Bạn chắc chắn xoá chức vụ này không"
                             onConfirm={() => handleDeleteEmployee(item._id)}
                             onCancel={""}
                             okText="Yes"

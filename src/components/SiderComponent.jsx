@@ -4,7 +4,7 @@ import { PiUsersThree } from "react-icons/pi";
 import { FaRegUser } from "react-icons/fa";
 import { LuGraduationCap, LuUserCog2 } from "react-icons/lu";
 import { LiaUserTieSolid } from "react-icons/lia";
-import { TbCertificate } from "react-icons/tb";
+import { FaUsersGear } from "react-icons/fa6";
 import { appInfo } from "../constants/appInfos"
 
 import { Link, useLocation } from "react-router-dom";
@@ -17,7 +17,7 @@ const SiderComponent = () => {
     let location = useLocation();
     useEffect(() => {
         if (location && location.pathname) {
-            const allRoute = ["dashboard", "employee", 'student', 'class', "position", "level"];
+            const allRoute = ["dashboard", "employee", 'student', 'class', "position", "level", "specialize", "deportment"];
             const currentRoute = allRoute.find((item) => location.pathname.split("/")[1] === item);
             if (currentRoute) {
                 setCurrent(currentRoute);
@@ -57,14 +57,14 @@ const SiderComponent = () => {
                     icon: <LuGraduationCap size={20} />,
                 },
                 {
-                    key: "expertise",
-                    label: <Link to={"/"}>Chuyên môn</Link>,
+                    key: "specialize",
+                    label: <Link to={"/specialize"}>Chuyên môn</Link>,
                     icon: <LuUserCog2 size={20} />,
                 },
                 {
-                    key: "certificate",
-                    label: <Link to={"/"}>Bằng cấp</Link>,
-                    icon: <TbCertificate size={20} />,
+                    key: "deportment",
+                    label: <Link to={"/"}>Phòng ban</Link>,
+                    icon: <FaUsersGear size={20} />,
                 },
             ]
         },

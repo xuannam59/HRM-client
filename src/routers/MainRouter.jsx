@@ -3,7 +3,7 @@ import { authSelector } from "../redux/reducers/authReducer";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { Affix, Layout } from "antd";
 import { HeaderComponent, SiderComponent } from "../components";
-import { HomePage, EmployeePage, ErrorPage, PositionPage, LevelPage } from "../pages";
+import { HomePage, EmployeePage, ErrorPage, PositionPage, LevelPage, SpecializePage } from "../pages";
 import EmployeeDetailComponent from "../components/EmployeeDetailComponent";
 
 const { Header, Sider, Content, Footer } = Layout;
@@ -24,6 +24,7 @@ const MainRouter = () => {
                                 <Route path="/employee/detail/:id" element={<EmployeeDetailComponent />} />
                                 <Route path="/position" element={<PositionPage />} />
                                 <Route path="/level" element={<LevelPage />} />
+                                <Route path="/specialize" element={<SpecializePage />} />
                                 <Route path="*" element={<Navigate to="/404" />} />
                                 <Route path="/404" element={<ErrorPage />} />
                             </Routes>

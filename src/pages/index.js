@@ -5,6 +5,7 @@ import EmployeePage from "./EmployeePage"
 import PositionPage from "./PositionPage"
 import LevelPage from "./LevelPage"
 import ErrorPage from "./ErrorPage"
+import SpecializePage from "./SpecializePage"
 
 
 export {
@@ -14,5 +15,6 @@ export {
   LevelPage,
   EmployeePage,
   PositionPage,
-  ErrorPage
+  SpecializePage,
+  ErrorPage,
 }

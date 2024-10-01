@@ -4,6 +4,8 @@ import handleApi from "../api/handleAPI";
 import { uploadFile } from "../utils/uploadFile.util";
 import { replaceName } from "../utils/replaceName.util";
 import moment from 'moment';
+import { useSelector } from "react-redux";
+import { authSelector } from "../redux/reducers/authReducer";
 
 const { TextArea } = Input;
 
@@ -15,7 +17,12 @@ const ToggleModal = (props) => {
     const [isLoading, setIsLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState(undefined);
     const [preview, setPreview] = useState(undefined);
+    const [positions, setPositions] = useState(undefined);
+    const [levels, setLevels] = useState(undefined);
+    const [specialize, setSpecialize] = useState(undefined);
     const [form] = Form.useForm();
+
+    const user = useSelector(authSelector);
 
     useEffect(() => {
         if (employeeSelected) {
@@ -26,11 +33,55 @@ const ToggleModal = (props) => {
             form.setFieldsValue(employeeSelected);
         }
     }, [employeeSelected]);
+
+    useEffect(() => {
+        getPositions();
+    }, []);
     const handleCancel = () => {
         form.resetFields();
         setSelectedFile(undefined);
         setPreview(undefined);
         onClose();
+    }
+
+    const getPositions = async () => {
+        const apiPositions = `/positions/all`;
+        const apiLevels = `/levels/all`;
+        const apiSpecialize = `/specializes/all`;
+        try {
+            const resPositions = await handleApi(apiPositions);
+            if (resPositions.data) {
+                const data = resPositions.data.map(item => {
+                    return {
+                        value: item._id,
+                        label: item.title
+                    }
+                });
+                setPositions(data);
+            }
+            const resLevels = await handleApi(apiLevels);
+            if (resLevels.data) {
+                const data = resLevels.data.map(item => {
+                    return {
+                        value: item._id,
+                        label: item.title
+                    }
+                });
+                setLevels(data);
+            }
+            const resSpecialize = await handleApi(apiSpecialize);
+            if (resSpecialize.data) {
+                const data = resSpecialize.data.map(item => {
+                    return {
+                        value: item._id,
+                        label: item.title
+                    }
+                });
+                setSpecialize(data);
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     const onSelectFile = (event) => {
@@ -120,7 +171,6 @@ const ToggleModal = (props) => {
                             }}>Upload</label>
                         </div>
                     </div>
-
                     <div className="row">
                         <div className="col-6">
                             <Form.Item
@@ -169,7 +219,6 @@ const ToggleModal = (props) => {
                             </Form.Item>
                         </div>
                     </div>
-
                     <div className="row">
                         <div className="col-3 pe-0">
                             <Form.Item
@@ -222,20 +271,35 @@ const ToggleModal = (props) => {
                             </Form.Item>
                         </div>
                     </div>
-
                     <div className="row">
                         <div className="col">
                             <Form.Item
-                                name={"address"}
-                                label="Địa chỉ"
+                                style={{ marginBottom: 0 }}
+                                name={"levelId"}
+                                label="Trình độ"
                             >
-                                <TextArea rows={4} placeholder="Địa chỉ" />
+                                <Select
+                                    options={levels}
+                                    placeholder="Trình độ"
+                                />
                             </Form.Item>
                         </div>
                         <div className="col">
                             <Form.Item
                                 style={{ marginBottom: 0 }}
-                                name={"y"}
+                                name={"specializeId"}
+                                label="Chuyên môn"
+                            >
+                                <Select
+                                    options={specialize}
+                                    placeholder="Bộ phận"
+                                />
+                            </Form.Item>
+                        </div>
+                        <div className="col">
+                            <Form.Item
+                                style={{ marginBottom: 0 }}
+                                name={"deportmentId"}
                                 label="Phòng ban"
                             >
                                 <Select
@@ -256,30 +320,25 @@ const ToggleModal = (props) => {
                                     placeholder="Bộ phận"
                                 />
                             </Form.Item>
+                        </div>
+                        <div className="col">
                             <Form.Item
-                                name={"x"}
+                                name={"positionId"}
                                 label="Chức vụ"
                             >
                                 <Select
-                                    options={[
-                                        {
-                                            value: "director",
-                                            label: "Giám đốc"
-                                        },
-                                        {
-                                            value: "vicedirector",
-                                            label: "Phó giám đốc"
-                                        },
-                                        {
-                                            value: "employee",
-                                            label: "nhân viên"
-                                        },
-                                    ]}
+                                    options={positions}
                                     placeholder="Chức vụ"
                                 />
                             </Form.Item>
                         </div>
                     </div>
+                    <Form.Item
+                        name={"address"}
+                        label="Địa chỉ"
+                    >
+                        <TextArea placeholder="Địa chỉ" rows={1} />
+                    </Form.Item>
                     <Form.Item
                         name="status"
                         label="Trạng thái"
@@ -289,34 +348,33 @@ const ToggleModal = (props) => {
                             <Radio value={"inactive"}>Nghỉ việc</Radio>
                         </Radio.Group>
                     </Form.Item>
-                    {employeeSelected &&
-                        <div className="row">
-                            <div className="col">
+
+                    <div className="row">
+                        <div className="col-5">
+                            {employeeSelected ?
                                 <Form.Item
-                                    name="createdAt"
-                                    label="Khởi tạo"
+                                    name="UpdateBy"
+                                    label="Cập nhập bởi"
                                 >
-                                    <DatePicker format={"DD/MM/YYYY"} disabled />
+                                    <Input disabled defaultValue={user.fullName} />
                                 </Form.Item>
-                            </div>
-                            <div className="col">
-                                <Form.Item
-                                    name="updatedAt"
-                                    label="Cập nhật"
-                                >
-                                    <DatePicker format={"DD/MM/YYYY"} disabled />
-                                </Form.Item>
-                            </div>
-                            <div className="col">
+                                :
                                 <Form.Item
                                     name="createBy"
                                     label="Tạo bởi"
                                 >
-                                    <Input disabled />
+                                    <Input disabled defaultValue={user.fullName} />
                                 </Form.Item>
-                            </div>
+                            }
                         </div>
-                    }
+                        <div className="col">
+                            <Form.Item
+                                label={employeeSelected ? "Ngày cập nhập" : "Ngày tạo"}
+                            >
+                                <DatePicker format={"DD/MM/YYYY"} disabled defaultValue={moment()} />
+                            </Form.Item>
+                        </div>
+                    </div>
                 </Form>
                 <input type="file" accept="image/*" id="uploadImage"
                     onChange={(event) => onSelectFile(event)}
