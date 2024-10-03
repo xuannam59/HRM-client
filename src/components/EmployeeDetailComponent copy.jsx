@@ -74,7 +74,7 @@ const EmployeeDetailComponent = () => {
                 <Avatar src={dataEmployee.avatar} size={200} />
             </div>
             <div className="container text-center mt-5">
-                <Descriptions title="Thông tin giáo viên" bordered items={items} />
+                <Descriptions title="Thông tin nhân viên" bordered items={items} />
             </div>
         </>
     )

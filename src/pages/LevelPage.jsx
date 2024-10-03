@@ -127,7 +127,7 @@ const LevelPage = () => {
                         </Tooltip>
                         <Popconfirm
                             placement="right"
-                            title="Xoá giáo viên"
+                            title="Xoá nhân viên"
                             description="Bạn chắc chắn xoá nhân viên này không"
                             onConfirm={() => handleDeleteLevel(record._id)}
                             onCancel={""}

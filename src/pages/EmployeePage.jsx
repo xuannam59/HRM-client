@@ -70,7 +70,7 @@ const EmployeePage = () => {
                 loadData();
                 notification.success({
                     message: res.message,
-                    description: "Xoá giáo viên thành công"
+                    description: "Xoá nhân viên thành công"
                 })
             } else {
                 notification.error({
@@ -190,7 +190,7 @@ const EmployeePage = () => {
                         </Tooltip>
                         <Popconfirm
                             placement="right"
-                            title="Xoá giáo viên"
+                            title="Xoá nhân viên"
                             description="Bạn chắc chắn xoá nhân viên này không"
                             onConfirm={() => handleDeleteEmployee(item._id)}
                             onCancel={""}

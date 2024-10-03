@@ -133,7 +133,7 @@ const SpecializePage = () => {
                         </Tooltip>
                         <Popconfirm
                             placement="right"
-                            title="Xoá giáo viên"
+                            title="Xoá nhân viên"
                             description="Bạn chắc chắn xoá chuyên môn này không"
                             onConfirm={() => handleDeleteEmployee(item._id)}
                             onCancel={""}

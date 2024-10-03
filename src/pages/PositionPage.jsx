@@ -154,7 +154,7 @@ const PositionPage = () => {
                         </Tooltip>
                         <Popconfirm
                             placement="right"
-                            title="Xoá giáo viên"
+                            title="Xoá nhân viên"
                             description="Bạn chắc chắn xoá chức vụ này không"
                             onConfirm={() => handleDeleteEmployee(item._id)}
                             onCancel={""}

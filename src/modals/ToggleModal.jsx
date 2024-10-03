@@ -121,10 +121,10 @@ const ToggleModal = (props) => {
                 loadData();
                 notification.success(employeeSelected ? {
                     message: "Updata Susseccfully",
-                    description: "Cập nhập giáo viên thành công"
+                    description: "Cập nhập nhân viên thành công"
                 } : {
                     message: "Create Susseccfully",
-                    description: "Tạo giáo viên thành công"
+                    description: "Tạo nhân viên thành công"
                 });
             } else {
                 notification.error({
