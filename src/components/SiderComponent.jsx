@@ -4,7 +4,7 @@ import { PiUsersThree } from "react-icons/pi";
 import { FaRegUser } from "react-icons/fa";
 import { LuGraduationCap, LuUserCog2 } from "react-icons/lu";
 import { LiaUserTieSolid } from "react-icons/lia";
-import { FaUsersGear } from "react-icons/fa6";
+import { ImTree } from "react-icons/im";
 import { appInfo } from "../constants/appInfos"
 
 import { Link, useLocation } from "react-router-dom";
@@ -17,7 +17,7 @@ const SiderComponent = () => {
     let location = useLocation();
     useEffect(() => {
         if (location && location.pathname) {
-            const allRoute = ["dashboard", "employee", 'student', 'class', "position", "level", "specialize", "deportment"];
+            const allRoute = ["dashboard", "employee", 'student', 'class', "position", "level", "specialize", "department"];
             const currentRoute = allRoute.find((item) => location.pathname.split("/")[1] === item);
             if (currentRoute) {
                 setCurrent(currentRoute);
@@ -38,7 +38,7 @@ const SiderComponent = () => {
             icon: <FiHome size={20} />
         },
         {
-            label: " Management Employee",
+            label: "Quản lý nhân viên",
             icon: <PiUsersThree size={25} />,
             children: [
                 {
@@ -61,17 +61,17 @@ const SiderComponent = () => {
                     label: <Link to={"/specialize"}>Chuyên môn</Link>,
                     icon: <LuUserCog2 size={20} />,
                 },
-                {
-                    key: "deportment",
-                    label: <Link to={"/"}>Phòng ban</Link>,
-                    icon: <FaUsersGear size={20} />,
-                },
             ]
+        },
+        {
+            key: "department",
+            label: <Link to={"/department"}>Quản lý phòng ban</Link>,
+            icon: <ImTree size={20} />,
         },
     ];
     return (
         <>
-            <div className="" style={{ width: "200px" }}>
+            <div className="" style={{ width: "220px" }}>
                 <Sider theme="light" width={"100%"} style={{ height: "100vh" }}>
                     <div className="p-2 text-center">
                         <img src={appInfo.Logo} alt={appInfo.title} width={64} />

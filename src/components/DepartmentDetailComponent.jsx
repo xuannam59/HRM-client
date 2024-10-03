@@ -1,33 +1,33 @@
-import { Avatar, Button, notification, Popconfirm, Radio, Space, Table, Tag, Tooltip, Typography } from "antd";
+import { Avatar, Breadcrumb, Button, notification, Popconfirm, Space, Spin, Table, Tag, Tooltip, Typography } from "antd";
 import { useEffect, useState } from "react";
-import { IoIosAdd } from "react-icons/io";
-import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
-import ToggleModal from "../modals/ToggleModal";
 import handelAPI from "../api/handleAPI";
-import { Link } from "react-router-dom";
-import { FiDownload } from "react-icons/fi";
-import { exportExcel } from "../utils/exportExcel.util";
 import moment from "moment";
+import { Link } from "react-router-dom";
+import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
+import { exportExcel } from "../utils/exportExcel.util";
+import { IoIosAdd } from "react-icons/io";
+import { FiDownload } from "react-icons/fi";
+import AddDepartmentEmployee from "../modals/addDepartmentEmployee";
 
 const { Title } = Typography;
 
-const EmployeePage = () => {
+const DepartmentDetailComponent = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [visible, setVisible] = useState(false);
     const [dataSource, setDataSource] = useState([]);
-    const [employeeSelected, setEmployeeSelected] = useState();
     const [current, setCurrent] = useState(1);
+    const [departmentTitle, setDepartmentTitle] = useState("");
     const [pageSize, setPageSize] = useState(5);
     const [total, setTotal] = useState(0);
-    const [status, setStatus] = useState("");
+    const id = location.pathname.split("/")[3];
 
     useEffect(() => {
         loadData();
-    }, [current, pageSize, status]);
+    }, [current, pageSize]);
 
     const loadData = async () => {
         setIsLoading(true);
-        const api = `/employees?current=${current}&&pageSize=${pageSize}&&status=${status}`;
+        const api = `/departments/detail-employee/${id}?current=${current}&&pageSize=${pageSize}`;
         try {
             const res = await handelAPI(api);
 
@@ -36,6 +36,7 @@ const EmployeePage = () => {
                     item.createdAt = moment(item.createdAt).format("DD/MM/YYYY");
                     item.updatedAt = moment(item.updatedAt).format("DD/MM/YYYY");
                 });
+                setDepartmentTitle(res.departmentTitle);
                 setDataSource(res.data);
                 setCurrent(res.meta.current);
                 setPageSize(res.meta.pageSize);
@@ -57,20 +58,15 @@ const EmployeePage = () => {
         }
     }
 
-    const onChangeStatus = (event) => {
-        setStatus(event.target.value);
-        setCurrent(1);
-    }
-
     const handleDeleteEmployee = async (id) => {
-        const api = `/employees/delete/${id}`;
+        const api = `/departments/detail-employee/delete/${id}`;
         try {
             const res = await handelAPI(api, "", "delete");
             if (res.data) {
                 loadData();
                 notification.success({
                     message: res.message,
-                    description: "Xoá giáo viên thành công"
+                    description: "Xoá nhân viên khỏi phòng ban thành công"
                 })
             } else {
                 notification.error({
@@ -104,26 +100,12 @@ const EmployeePage = () => {
         },
         {
             title: 'Họ tên',
-            render: (item) => {
-                return (
-                    <>
-                        <Link to={`/employee/detail/${item._id}`} >{item.fullName}</Link>
-                    </>
-                );
-            },
+            dataIndex: "fullName",
             fixed: "left",
-        },
-        {
-            title: "Trình độ",
-            dataIndex: "infoLevel"
         },
         {
             title: "Chuyên môn",
             dataIndex: "infoSpecialize"
-        },
-        {
-            title: "Phòng ban",
-            dataIndex: "infoDepartment"
         },
         {
             title: "Chức vụ",
@@ -136,10 +118,6 @@ const EmployeePage = () => {
         {
             title: "Số điện thoại",
             dataIndex: "phoneNumber"
-        },
-        {
-            title: "Giới tính",
-            dataIndex: "gender"
         },
         {
             title: "Trạng thái",
@@ -165,33 +143,15 @@ const EmployeePage = () => {
             }
         },
         {
-            title: "Ngày tạo",
-            dataIndex: "createdAt"
-        },
-        {
-            title: "Ngày cập nhập",
-            dataIndex: "updatedAt"
-        },
-        {
             title: "Action",
             fixed: "right",
             render: (item) => {
                 return (<>
                     <Space>
-                        <Tooltip title="Edit" color="#2db7f5">
-                            <Button
-                                type="link"
-                                icon={<MdOutlineEdit size={20} />}
-                                onClick={() => {
-                                    setEmployeeSelected(item);
-                                    setVisible(true);
-                                }}
-                            />
-                        </Tooltip>
                         <Popconfirm
                             placement="right"
-                            title="Xoá giáo viên"
-                            description="Bạn chắc chắn xoá nhân viên này không"
+                            title="Xoá nhân viên khỏi phòng ban"
+                            description="Bạn chắc chắn xoá nhân viên này"
                             onConfirm={() => handleDeleteEmployee(item._id)}
                             onCancel={""}
                             okText="Yes"
@@ -211,7 +171,7 @@ const EmployeePage = () => {
     ];
 
     const handleExportExcel = async () => {
-        const api = `/employees/all`;
+        const api = `/departments/all`;
         try {
             const res = await handelAPI(api);
             if (res.data) {
@@ -223,19 +183,23 @@ const EmployeePage = () => {
             console.log(error);
         }
     }
-    return (
+    return (isLoading ? <div className="row align-items-center" style={{ height: "100%" }}><Spin /> </div> :
         <>
+            <div className="m-3">
+                <Breadcrumb
+                    items={[
+                        {
+                            title: <Link to="/department">Department</Link>,
+                        },
+                        {
+                            title: `${departmentTitle}`,
+                        }
+                    ]}
+                />
+            </div>
             <div className="row m-3">
                 <div className="col text-left">
-                    <Title level={4}>List Employee</Title>
-                </div>
-
-                <div className="col text-center">
-                    <Radio.Group onChange={(event) => onChangeStatus(event)} defaultValue={status} buttonStyle="solid">
-                        <Radio.Button value={""}>Tất cả</Radio.Button>
-                        <Radio.Button value={"active"}>Đang công tác</Radio.Button>
-                        <Radio.Button value={"inactive"}>Ngừng công tác</Radio.Button>
-                    </Radio.Group>
+                    <Title level={5}>{departmentTitle}</Title>
                 </div>
 
                 <div className="col text-end">
@@ -244,7 +208,7 @@ const EmployeePage = () => {
                         onClick={() => { setVisible(true) }}
                         icon={<IoIosAdd size={20} />}
                     >
-                        Thêm</Button>
+                        Thêm Nhân viên</Button>
                     <Button className="ms-2" icon={<FiDownload />} onClick={handleExportExcel}>Xuất excel</Button>
                 </div>
             </div >
@@ -268,17 +232,16 @@ const EmployeePage = () => {
                 rowKey="_id"
             />
 
-            <ToggleModal
+            <AddDepartmentEmployee
                 visible={visible}
                 loadData={loadData}
-                employeeSelected={employeeSelected}
                 onClose={() => {
                     setVisible(false);
-                    setEmployeeSelected(undefined);
                 }}
+                departmentId={id}
             />
         </>
     );
 }
 
-export default EmployeePage;
+export default DepartmentDetailComponent;

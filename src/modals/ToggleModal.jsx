@@ -20,6 +20,7 @@ const ToggleModal = (props) => {
     const [positions, setPositions] = useState(undefined);
     const [levels, setLevels] = useState(undefined);
     const [specialize, setSpecialize] = useState(undefined);
+    const [department, setDepartment] = useState(undefined);
     const [form] = Form.useForm();
 
     const user = useSelector(authSelector);
@@ -27,15 +28,13 @@ const ToggleModal = (props) => {
     useEffect(() => {
         if (employeeSelected) {
             employeeSelected.birthday = moment(employeeSelected.birthday);
-            employeeSelected.createdAt = moment(employeeSelected.createdAt);
-            employeeSelected.updatedAt = moment(employeeSelected.updatedAt);
             setPreview(employeeSelected.avatar);
             form.setFieldsValue(employeeSelected);
         }
     }, [employeeSelected]);
 
     useEffect(() => {
-        getPositions();
+        getDataList();
     }, []);
     const handleCancel = () => {
         form.resetFields();
@@ -44,10 +43,11 @@ const ToggleModal = (props) => {
         onClose();
     }
 
-    const getPositions = async () => {
+    const getDataList = async () => {
         const apiPositions = `/positions/all`;
         const apiLevels = `/levels/all`;
         const apiSpecialize = `/specializes/all`;
+        const apiDepartment = `/departments/all`;
         try {
             const resPositions = await handleApi(apiPositions);
             if (resPositions.data) {
@@ -79,11 +79,20 @@ const ToggleModal = (props) => {
                 });
                 setSpecialize(data);
             }
+            const resDepartment = await handleApi(apiDepartment);
+            if (resDepartment.data) {
+                const data = resDepartment.data.map(item => {
+                    return {
+                        value: item._id,
+                        label: item.title
+                    }
+                });
+                setDepartment(data);
+            }
         } catch (error) {
             console.log(error)
         }
     }
-
     const onSelectFile = (event) => {
         if (!event.target.files || event.target.files.length === 0) {
             setPreview(null);
@@ -100,7 +109,7 @@ const ToggleModal = (props) => {
         setIsLoading(true);
         const data = values;
         const api = `/employees/${employeeSelected ? `update/${employeeSelected._id}` : "create"}`;
-        data.birthday = moment(data.birthday.$d).format();
+        data.birthday = moment(data.birthday).format();
         if (selectedFile && preview) {
             data.avatar = await uploadFile(selectedFile);
         }
@@ -227,12 +236,12 @@ const ToggleModal = (props) => {
                                 rules={[
                                     {
                                         required: true,
-                                        message: "Vui lòng nhập căng cước công dân!"
+                                        message: "Vui lòng nhập CCCD!"
                                     }
                                 ]}
                             >
 
-                                <Input placeholder="CCCD" />
+                                <Input placeholder="CCCD" disabled={employeeSelected ? true : false} />
                             </Form.Item>
                         </div>
                         <div className="col-4 pe-0">
@@ -277,6 +286,12 @@ const ToggleModal = (props) => {
                                 style={{ marginBottom: 0 }}
                                 name={"levelId"}
                                 label="Trình độ"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Vui lòng không để trống!"
+                                    }
+                                ]}
                             >
                                 <Select
                                     options={levels}
@@ -287,37 +302,32 @@ const ToggleModal = (props) => {
                         <div className="col">
                             <Form.Item
                                 style={{ marginBottom: 0 }}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Vui lòng không để trống!"
+                                    }
+                                ]}
                                 name={"specializeId"}
                                 label="Chuyên môn"
                             >
                                 <Select
                                     options={specialize}
-                                    placeholder="Bộ phận"
+                                    placeholder="Chuyên môn"
                                 />
                             </Form.Item>
                         </div>
+                    </div>
+                    <div className="row">
                         <div className="col">
                             <Form.Item
                                 style={{ marginBottom: 0 }}
-                                name={"deportmentId"}
+                                name={"departmentId"}
                                 label="Phòng ban"
                             >
                                 <Select
-                                    options={[
-                                        {
-                                            value: "a",
-                                            label: "Kế toán"
-                                        },
-                                        {
-                                            value: "vicedirector",
-                                            label: "Lập trình"
-                                        },
-                                        {
-                                            value: "employee",
-                                            label: "Nhân sự"
-                                        },
-                                    ]}
-                                    placeholder="Bộ phận"
+                                    options={department}
+                                    placeholder="Phòng ban"
                                 />
                             </Form.Item>
                         </div>
@@ -325,6 +335,12 @@ const ToggleModal = (props) => {
                             <Form.Item
                                 name={"positionId"}
                                 label="Chức vụ"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Vui lòng không để trống!"
+                                    }
+                                ]}
                             >
                                 <Select
                                     options={positions}
@@ -353,14 +369,12 @@ const ToggleModal = (props) => {
                         <div className="col-5">
                             {employeeSelected ?
                                 <Form.Item
-                                    name="UpdateBy"
                                     label="Cập nhập bởi"
                                 >
                                     <Input disabled defaultValue={user.fullName} />
                                 </Form.Item>
                                 :
                                 <Form.Item
-                                    name="createBy"
                                     label="Tạo bởi"
                                 >
                                     <Input disabled defaultValue={user.fullName} />
