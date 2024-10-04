@@ -1,36 +1,32 @@
-import { Avatar, Button, notification, Popconfirm, Radio, Space, Table, Tag, Tooltip, Typography } from "antd";
+import { Button, notification, Popconfirm, Radio, Space, Table, Tag, Tooltip, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { IoIosAdd } from "react-icons/io";
 import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
-import ToggleModal from "../modals/ToggleModal";
-import handelAPI from "../api/handleAPI";
-import { Link } from "react-router-dom";
-import { FiDownload } from "react-icons/fi";
-import { exportExcel } from "../utils/exportExcel.util";
+import handelAPI from "../../api/handleAPI";
 import moment from "moment";
+import ToggleModalDepartment from "../../modals/ToggleModalDepartment";
+import { Link } from "react-router-dom";
 
 const { Title } = Typography;
 
-const EmployeePage = () => {
+const DepartmentPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [visible, setVisible] = useState(false);
-    const [dataSource, setDataSource] = useState([]);
-    const [employeeSelected, setEmployeeSelected] = useState();
     const [current, setCurrent] = useState(1);
     const [pageSize, setPageSize] = useState(5);
     const [total, setTotal] = useState(0);
-    const [status, setStatus] = useState("");
+    const [departmentSelected, setDepartmentSelected] = useState(undefined);
+    const [dataSource, setDataSource] = useState([]);
 
     useEffect(() => {
         loadData();
-    }, [current, pageSize, status]);
+    }, [current, pageSize]);
 
     const loadData = async () => {
         setIsLoading(true);
-        const api = `/employees?current=${current}&&pageSize=${pageSize}&&status=${status}`;
+        const api = `/departments?current=${current}&&pageSize=${pageSize}`;
         try {
             const res = await handelAPI(api);
-
             if (res.data) {
                 res.data.forEach(item => {
                     item.createdAt = moment(item.createdAt).format("DD/MM/YYYY");
@@ -40,6 +36,11 @@ const EmployeePage = () => {
                 setCurrent(res.meta.current);
                 setPageSize(res.meta.pageSize);
                 setTotal(res.meta.total);
+            } else {
+                notification.error({
+                    message: "Error",
+                    description: "Error"
+                })
             }
         } catch (error) {
             console.log(error);
@@ -47,7 +48,6 @@ const EmployeePage = () => {
             setIsLoading(false);
         }
     }
-
     const onChangeTable = (pagination, filters, sorter, extra) => {
         if (pagination.current && pagination.current !== current) {
             setCurrent(pagination.current);
@@ -57,20 +57,16 @@ const EmployeePage = () => {
         }
     }
 
-    const onChangeStatus = (event) => {
-        setStatus(event.target.value);
-        setCurrent(1);
-    }
-
     const handleDeleteEmployee = async (id) => {
-        const api = `/employees/delete/${id}`;
+        const api = `/departments/delete/${id}`;
         try {
             const res = await handelAPI(api, "", "delete");
             if (res.data) {
+
                 loadData();
                 notification.success({
                     message: res.message,
-                    description: "Xoá nhân viên thành công"
+                    description: "Xoá phòng ban thành công"
                 })
             } else {
                 notification.error({
@@ -86,90 +82,46 @@ const EmployeePage = () => {
     const columns = [
         {
             title: 'STT',
-            render: (_, record, index) => {
+            dataIndex: "index",
+            render: (text, record, index) => {
                 return (index + 1) + (current - 1) * pageSize;
             },
-            fixed: "left",
+            width: 'max-content'
         },
         {
-            title: "Avatar",
-            render: (item, record) => {
-                return (
-                    <>
-                        <Avatar src={item.avatar} size={50} />
-                    </>
-                )
-            },
-            fixed: "left",
+            title: 'Mã phòng ban',
+            render: (text, record) => {
+                return <Link to={`/department/detail/${record._id}`} >{record._id}</Link>
+            }
+
         },
         {
-            title: 'Họ tên',
-            render: (item) => {
-                return (
-                    <>
-                        <Link to={`/employee/detail/${item._id}`} >{item.fullName}</Link>
-                    </>
-                );
-            },
-            fixed: "left",
+            title: 'Tên phòng ban',
+            dataIndex: "title",
         },
         {
-            title: "Trình độ",
-            dataIndex: "infoLevel"
-        },
-        {
-            title: "Chuyên môn",
-            dataIndex: "infoSpecialize"
-        },
-        {
-            title: "Phòng ban",
-            dataIndex: "infoDepartment"
-        },
-        {
-            title: "Chức vụ",
-            dataIndex: "infoPosition"
-        },
-        {
-            title: "Email",
-            dataIndex: "email"
-        },
-        {
-            title: "Số điện thoại",
-            dataIndex: "phoneNumber"
-        },
-        {
-            title: "Giới tính",
-            dataIndex: "gender"
-        },
-        {
-            title: "Trạng thái",
-            dataIndex: "status",
-            render: (_, record) => {
-                let color, status;
-                switch (record.status) {
-                    case "active":
-                        color = "green";
-                        status = "Làm việc"
-                        break
-                    case "inactive":
-                        color = "red";
-                        status = "Nghỉ việc";
-                        break
-                    default:
-                        color = "#f50";
-                        status = "Updating";
-                }
-                return (
-                    <Tag color={color}>{status}</Tag>
-                )
+            title: 'Số nhân viên',
+            dataIndex: "employeeQuantity",
+            align: "center",
+            render: (text) => {
+                return <Tag color={text < 1 ? "#f50" : "#87d068"}>{text}</Tag>
             }
         },
         {
-            title: "Ngày tạo",
+            title: 'Mô tả',
+            dataIndex: "description",
+            width: 250
+        },
+        {
+            title: 'Ngày tạo',
             dataIndex: "createdAt"
         },
         {
-            title: "Ngày cập nhập",
+            title: 'Người tạo',
+            dataIndex: "infoCreatedBy"
+        },
+        {
+            title: 'Ngày sửa',
             dataIndex: "updatedAt"
         },
         {
@@ -183,15 +135,15 @@ const EmployeePage = () => {
                                 type="link"
                                 icon={<MdOutlineEdit size={20} />}
                                 onClick={() => {
-                                    setEmployeeSelected(item);
+                                    setDepartmentSelected(item);
                                     setVisible(true);
                                 }}
                             />
                         </Tooltip>
                         <Popconfirm
                             placement="right"
-                            title="Xoá nhân viên"
-                            description="Bạn chắc chắn xoá nhân viên này không"
+                            title="Xoá phòng ban"
+                            description="Bạn chắc chắn xoá phòng ban này không"
                             onConfirm={() => handleDeleteEmployee(item._id)}
                             onCancel={""}
                             okText="Yes"
@@ -208,35 +160,15 @@ const EmployeePage = () => {
                 </>);
             }
         }
-    ];
 
-    const handleExportExcel = async () => {
-        const api = `/employees/all`;
-        try {
-            const res = await handelAPI(api);
-            if (res.data) {
-                const data = res.data;
-                delete data.passport;
-                exportExcel(data);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
+    ];
     return (
         <>
             <div className="row m-3">
                 <div className="col text-left">
-                    <Title level={4}>List Employee</Title>
+                    <Title level={4}>Danh sách phòng ban</Title>
                 </div>
 
-                <div className="col text-center">
-                    <Radio.Group onChange={(event) => onChangeStatus(event)} defaultValue={status} buttonStyle="solid">
-                        <Radio.Button value={""}>Tất cả</Radio.Button>
-                        <Radio.Button value={"active"}>Đang công tác</Radio.Button>
-                        <Radio.Button value={"inactive"}>Ngừng công tác</Radio.Button>
-                    </Radio.Group>
-                </div>
 
                 <div className="col text-end">
                     <Button
@@ -245,7 +177,6 @@ const EmployeePage = () => {
                         icon={<IoIosAdd size={20} />}
                     >
                         Thêm</Button>
-                    <Button className="ms-2" icon={<FiDownload />} onClick={handleExportExcel}>Xuất excel</Button>
                 </div>
             </div >
             <Table
@@ -261,24 +192,23 @@ const EmployeePage = () => {
                     pageSizeOptions: [5, 10, 20, 50],
                     showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} rows</div>) }
                 }}
-                scroll={{
-                    x: 'max-content'
-                }}
+                scroll={
+                    { x: 'max-content' }
+                }
                 onChange={onChangeTable}
                 rowKey="_id"
             />
 
-            <ToggleModal
+            <ToggleModalDepartment
                 visible={visible}
                 loadData={loadData}
-                employeeSelected={employeeSelected}
+                departmentSelected={departmentSelected}
                 onClose={() => {
                     setVisible(false);
-                    setEmployeeSelected(undefined);
                 }}
             />
         </>
     );
 }
 
-export default EmployeePage;
+export default DepartmentPage;

@@ -1,9 +1,9 @@
 import { Avatar, Breadcrumb, Descriptions, notification, Spin } from "antd";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import handelAPI from "../api/handleAPI";
+import handelAPI from "../../api/handleAPI";
 
-const EmployeeDetailComponent = () => {
+const EmployeeDetail = () => {
     const location = useLocation();
     const [isLoading, setIsLoading] = useState(false);
     const [dataEmployee, setDataEmployee] = useState({});
@@ -80,4 +80,4 @@ const EmployeeDetailComponent = () => {
     )
 }
 
-export default EmployeeDetailComponent;
+export default EmployeeDetail;

@@ -1,17 +1,17 @@
 import { Avatar, Breadcrumb, Button, notification, Popconfirm, Space, Spin, Table, Tag, Tooltip, Typography } from "antd";
 import { useEffect, useState } from "react";
-import handelAPI from "../api/handleAPI";
+import handelAPI from "../../api/handleAPI";
 import moment from "moment";
 import { Link } from "react-router-dom";
 import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
-import { exportExcel } from "../utils/exportExcel.util";
+import { exportExcel } from "../../utils/exportExcel.util";
 import { IoIosAdd } from "react-icons/io";
 import { FiDownload } from "react-icons/fi";
-import AddDepartmentEmployee from "../modals/addDepartmentEmployee";
+import AddDepartmentEmployee from "../../modals/addDepartmentEmployee";
 
 const { Title } = Typography;
 
-const DepartmentDetailComponent = () => {
+const DepartmentDetail = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [visible, setVisible] = useState(false);
     const [dataSource, setDataSource] = useState([]);
@@ -244,4 +244,4 @@ const DepartmentDetailComponent = () => {
     );
 }
 
-export default DepartmentDetailComponent;
+export default DepartmentDetail;
