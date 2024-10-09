@@ -1,5 +1,5 @@
 import { Layout, Menu, Typography } from "antd";
-import { FiHome } from "react-icons/fi";
+import { FiPieChart } from "react-icons/fi";
 import { PiUsersThree } from "react-icons/pi";
 import { FaRegUser } from "react-icons/fa";
 import { LuGraduationCap, LuUserCog2 } from "react-icons/lu";
@@ -35,7 +35,7 @@ const SiderComponent = () => {
         {
             key: 'dashboard',
             label: <Link to={"/dashboard"}>Tổng quan</Link>,
-            icon: <FiHome size={20} />
+            icon: <FiPieChart size={20} />
         },
         {
             label: "Quản lý nhân viên",

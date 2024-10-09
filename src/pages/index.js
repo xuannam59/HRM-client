@@ -9,6 +9,8 @@ import ErrorPage from "./ErrorPage"
 import SpecializePage from "./SpecializePage"
 import DepartmentPage from "./departments/DepartmentPage"
 import DepartmentDetail from "./departments/DepartmentDetail"
+import PersonalInfoPage from "./PersonalInfoPage"
+import ResetPasswordPage from "./ResetPasswordPage"
 
 
 export {
@@ -22,5 +24,7 @@ export {
   SpecializePage,
   DepartmentPage,
   DepartmentDetail,
+  PersonalInfoPage,
+  ResetPasswordPage,
   ErrorPage,
 }
