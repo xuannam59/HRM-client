@@ -11,6 +11,7 @@ import DepartmentPage from "./departments/DepartmentPage"
 import DepartmentDetail from "./departments/DepartmentDetail"
 import PersonalInfoPage from "./PersonalInfoPage"
 import ResetPasswordPage from "./ResetPasswordPage"
+import ApplicationPage from "./ApplicationPage"
 
 
 export {
@@ -26,5 +27,6 @@ export {
   DepartmentDetail,
   PersonalInfoPage,
   ResetPasswordPage,
+  ApplicationPage,
   ErrorPage,
 }
