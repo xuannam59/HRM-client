@@ -5,21 +5,21 @@ import { useSelector } from "react-redux";
 import { authSelector } from "../redux/reducers/authReducer";
 import { generateString } from "../utils/generateString.util";
 
-const ToggleModalApplication = (props) => {
+const ToggleModalSchedule = (props) => {
     const {
         visible, onClose,
         setDataSource, dataSource,
-        applicationSelected
+        dataSelected
     } = props
 
     const user = useSelector(authSelector);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        if (applicationSelected) {
-            form.setFieldsValue(applicationSelected);
+        if (dataSelected) {
+            form.setFieldsValue(dataSelected);
         }
-    }, [applicationSelected]);
+    }, [dataSelected]);
 
     const [form] = Form.useForm();
 
@@ -27,16 +27,23 @@ const ToggleModalApplication = (props) => {
         setIsLoading(true);
         // Push vào phần tử
         const data = dataSource;
-        if (!applicationSelected) {
+        if (!dataSelected) {
             data.push(values)
             setDataSource(data);
         } else {
-            const index = data.findIndex(item => item._id === applicationSelected._id);
-            data[index] = values;
+            const index = data.findIndex(item => item._id === dataSelected._id);
+            data[index] = {
+                _id: values._id,
+                date: values.date,
+                subject: values.subject,
+                startDate: moment(values.startDate, "hh:mm:ss").format("LTS"),
+                endDate: moment(values.endDate, "hh:mm:ss").format("LTS"),
+                room: values.room
+            };
 
             setDataSource(data);
         }
-        notification.success(applicationSelected ? {
+        notification.success(dataSelected ? {
             message: "Update success",
             description: "Cập nhập tuyển dụng thánh công"
         } : {
@@ -54,11 +61,11 @@ const ToggleModalApplication = (props) => {
     return (<>
         <Modal
             closable={!isLoading}
-            title={applicationSelected ? "Update application" : "Create application"}
+            title={dataSelected ? "Update application" : "Create application"}
             open={visible}
             onCancel={handleCancel}
             onOk={() => form.submit()}
-            okText={applicationSelected ? "Update" : "CREATE"}
+            okText={dataSelected ? "Update" : "CREATE"}
             okButtonProps={{
                 loading: isLoading
             }}
@@ -74,12 +81,12 @@ const ToggleModalApplication = (props) => {
                 onFinish={onFinish}
                 disabled={isLoading}
                 initialValues={{
-                    "_id": !applicationSelected && generateString(25)
+                    "_id": !dataSelected && generateString(25)
                 }}
             >
                 <Form.Item
                     name={"_id"}
-                    label={"Mã tuyển dụng"}
+                    label={"Mã lịch"}
                     rules={[
                         {
                             required: true,
@@ -91,8 +98,8 @@ const ToggleModalApplication = (props) => {
                     <Input disabled={true} />
                 </Form.Item>
                 <Form.Item
-                    name={"position"}
-                    label={"Vị trí tuyển dụng"}
+                    name={"date"}
+                    label={"Ngày dạy"}
                     rules={[
                         {
                             required: true,
@@ -102,14 +109,17 @@ const ToggleModalApplication = (props) => {
                 >
 
                     <Select options={[
-                        { label: 'Vị trí tuyển dụng', disabled: true },
-                        { value: 'Giáo viên', label: 'Giáo viên' },
-                        { value: 'Kế Toán', label: 'Kế Toán' },
-                    ]} placeholder="Vị trí tuyển dụng" />
+                        { value: 'Thứ 2', label: 'Thứ 2' },
+                        { value: 'Thứ 3', label: 'Thứ 3' },
+                        { value: 'Thứ 4', label: 'Thứ 4' },
+                        { value: 'Thứ 5', label: 'Thứ 5' },
+                        { value: 'Thứ 6', label: 'Thứ 6' },
+                        { value: 'Thứ 7', label: 'Thứ 7' },
+                    ]} placeholder="Ngày dạy" />
                 </Form.Item>
                 <Form.Item
-                    name={"fullName"}
-                    label={"Họ tên"}
+                    name={"subject"}
+                    label={"Môn dạy"}
                     rules={[
                         {
                             required: true,
@@ -121,8 +131,8 @@ const ToggleModalApplication = (props) => {
                     <Input placeholder="Họ tên" />
                 </Form.Item>
                 <Form.Item
-                    name={"email"}
-                    label={"Email"}
+                    name={"startDate"}
+                    label={"Thời gian bắt đầu"}
                     rules={[
                         {
                             required: true,
@@ -131,12 +141,12 @@ const ToggleModalApplication = (props) => {
                     ]}
                 >
 
-                    <Input placeholder="Email" />
+                    <Input placeholder="Thời gian bắt đầu" />
                 </Form.Item>
 
                 <Form.Item
-                    name={"phoneNumber"}
-                    label={"Số điện thoại"}
+                    name={"endDate"}
+                    label={"Thời gian kết thúc"}
                     rules={[
                         {
                             required: true,
@@ -145,12 +155,12 @@ const ToggleModalApplication = (props) => {
                     ]}
                 >
 
-                    <Input placeholder="Số điện thoại" />
+                    <Input placeholder="Thời gian kết thúc" />
                 </Form.Item>
 
                 <Form.Item
-                    name={"address"}
-                    label={"địa chỉ"}
+                    name={"room"}
+                    label={"Phòng"}
                     rules={[
                         {
                             required: true,
@@ -159,7 +169,14 @@ const ToggleModalApplication = (props) => {
                     ]}
                 >
 
-                    <Input placeholder="địa chỉ" />
+                    <Select options={[
+                        { value: '101', label: '101' },
+                        { value: '102', label: '102' },
+                        { value: '103', label: '103' },
+                        { value: '201', label: '201' },
+                        { value: '202', label: '202' },
+                        { value: '203', label: '203' },
+                    ]} placeholder="Phòng" />
                 </Form.Item>
                 <Form.Item
                     name={"description"}
@@ -195,4 +212,4 @@ const ToggleModalApplication = (props) => {
     </>);
 }
 
-export default ToggleModalApplication;
+export default ToggleModalSchedule;

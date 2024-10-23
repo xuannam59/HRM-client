@@ -79,22 +79,6 @@ const SiderComponent = () => {
             icon: <ImTree size={20} />,
         },
         {
-            label: "Khen thưởng và kỷ luật",
-            icon: <FaMoneyBillTransfer size={20} />,
-            children: [
-                {
-                    key: "reward",
-                    label: <Link to={"/reward"}>Khen thưởng</Link>,
-                    icon: <GiReceiveMoney size={18} />,
-                },
-                {
-                    key: "discipline",
-                    label: <Link to={"/discipline"}>Kỷ luật</Link>,
-                    icon: <GiPayMoney size={18} />,
-                }
-            ]
-        },
-        {
             key: "application",
             label: <Link to={"/application"}>Quản lý tuyển dụng</Link>,
             icon: <FaUserPlus size={20} />,
@@ -113,6 +97,22 @@ const SiderComponent = () => {
             key: "fostering",
             label: <Link to={"/fostering"}>Quản lý bồi dưỡng</Link>,
             icon: <BsClipboard2CheckFill size={20} />,
+        },
+        {
+            label: "Khen thưởng và kỷ luật",
+            icon: <FaMoneyBillTransfer size={20} />,
+            children: [
+                {
+                    key: "reward",
+                    label: <Link to={"/reward"}>Khen thưởng</Link>,
+                    icon: <GiReceiveMoney size={18} />,
+                },
+                {
+                    key: "discipline",
+                    label: <Link to={"/discipline"}>Kỷ luật</Link>,
+                    icon: <GiPayMoney size={18} />,
+                }
+            ]
         },
         {
             key: "salary",

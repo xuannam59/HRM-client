@@ -1,7 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { Affix, Layout } from "antd";
 import { HeaderComponent, SiderComponent } from "../components";
-import { HomePage, EmployeePage, ErrorPage, PositionPage, LevelPage, SpecializePage, DepartmentPage, EmployeeDetail, DepartmentDetail, ResetPasswordPage, PersonalInfoPage, ApplicationPage } from "../pages";
+import {
+    HomePage, EmployeePage, ErrorPage,
+    PositionPage, LevelPage, SpecializePage,
+    DepartmentPage, EmployeeDetail, DepartmentDetail,
+    ResetPasswordPage, PersonalInfoPage, ApplicationPage,
+    SchedulePage
+} from "../pages";
 
 const { Header, Sider, Content, Footer } = Layout;
 
@@ -27,6 +33,7 @@ const MainRouter = () => {
                                 <Route path="/personal-info" element={<PersonalInfoPage />} />
                                 <Route path="/reset-password" element={<ResetPasswordPage />} />
                                 <Route path="/application" element={<ApplicationPage />} />
+                                <Route path="/schedule" element={<SchedulePage />} />
 
 
                                 <Route path="*" element={<Navigate to="/404" />} />

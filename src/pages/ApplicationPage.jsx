@@ -14,18 +14,30 @@ const ApplicationPage = () => {
         _id: "nSMưGnD6kDobUMm6671v1Zjv",
         fullName: "Lê Văn A",
         email: "levana@gmail.com",
+        position: "Giáo viên",
         phoneNumber: "123456789",
         address: "Bắc Ninh",
-        description: "ứng tuyển vị trí nhân viên development",
+        description: "ứng tuyển vị trí giáo viên",
     },
     {
         _id: "0gMl9WgIm1JuY5G3scxoj0a7R",
         fullName: "Lê Văn B",
         email: "levanb@gmail.com",
+        position: "Giáo viên",
         phoneNumber: "123456789",
         address: "Bắc Ninh",
-        description: "ứng tuyển vị trí nhân viên Kế toán",
-    }]);
+        description: "ứng tuyển vị trí nhân viên giáo viên",
+    },
+    {
+        _id: "gUWve7YBx6ejImaoASn0HvXdW",
+        fullName: "Lê Văn C",
+        email: "levanb@gmail.com",
+        position: "Kế toán",
+        phoneNumber: "123456789",
+        address: "Bắc Ninh",
+        description: "ứng tuyển vị trí nhân viên kế toán",
+    },
+    ]);
 
 
 
@@ -51,6 +63,10 @@ const ApplicationPage = () => {
         {
             title: 'Mã Tuyển dụng',
             dataIndex: "_id",
+        },
+        {
+            title: 'vị trí tuyển dụng',
+            dataIndex: "position",
         },
         {
             title: 'Họ tên',

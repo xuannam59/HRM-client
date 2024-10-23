@@ -12,6 +12,7 @@ import DepartmentDetail from "./departments/DepartmentDetail"
 import PersonalInfoPage from "./PersonalInfoPage"
 import ResetPasswordPage from "./ResetPasswordPage"
 import ApplicationPage from "./ApplicationPage"
+import SchedulePage from "./SchedulePage"
 
 
 export {
@@ -29,4 +30,5 @@ export {
   ResetPasswordPage,
   ApplicationPage,
   ErrorPage,
+  SchedulePage,
 }
