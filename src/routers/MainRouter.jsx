@@ -6,7 +6,8 @@ import {
     PositionPage, LevelPage, SpecializePage,
     DepartmentPage, EmployeeDetail, DepartmentDetail,
     ResetPasswordPage, PersonalInfoPage, ApplicationPage,
-    SchedulePage
+    SchedulePage,
+    CollaboratePage
 } from "../pages";
 
 const { Header, Sider, Content, Footer } = Layout;
@@ -34,6 +35,7 @@ const MainRouter = () => {
                                 <Route path="/reset-password" element={<ResetPasswordPage />} />
                                 <Route path="/application" element={<ApplicationPage />} />
                                 <Route path="/schedule" element={<SchedulePage />} />
+                                <Route path="/collaborate" element={<CollaboratePage />} />
 
 
                                 <Route path="*" element={<Navigate to="/404" />} />

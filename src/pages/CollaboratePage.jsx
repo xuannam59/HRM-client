@@ -1,70 +1,48 @@
 import { useState } from "react";
-import { Button, notification, Popconfirm, Space, Table, Tooltip, Typography } from "antd";
-import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
+import { Button, Space, Table, Tooltip, Typography } from "antd";
+import { MdOutlineEdit } from "react-icons/md";
 import { IoIosAdd } from "react-icons/io";
-import ToggleModalSchedule from "../modals/ToggleModalSchedule";
 import moment from "moment";
 import Link from "antd/es/typography/Link";
+import ToggleModalCollaborate from "../modals/ToggleModalCollaborate";
 
 const { Title } = Typography;
 
-const SchedulePage = () => {
+const CollaboratePage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [visible, setVisible] = useState(false);
     const [dataSelected, setDataSelected] = useState(undefined);
     const [dataSource, setDataSource] = useState([{
         _id: "nSMưGnDsdeobUMm6671v1Zjv",
-        date: "Thứ 2",
-        subject: "Toán",
-        startDate: moment("6", "hh:mm:ss").format("LTS"),
-        endDate: moment("9", "hh:mm:ss").format("LTS"),
-        room: "102"
+        fullName: "Lê Văn A",
+        unitName: "Trường Nguyễn Xuyến",
+        time: moment("2024-09-28T09:51:21.253+00:00").format("LL")
     },
     {
-        _id: "0gMl9WgIgrwsf5G3scxoj0a7R",
-        date: "Thứ 2",
-        subject: "Văn",
-        startDate: moment("9", "hh:mm:ss").format("LTS"),
-        endDate: moment("12", "hh:mm:ss").format("LTS"),
-        room: "102"
+        _id: "TNkQp1WLAc3Cp6yvRLREcJc",
+        fullName: "Trần Quốc Bảo",
+        unitName: "Trường Nguyễn Đăng Đạo",
+        time: moment("2024-09-21T15:55:19.220+00:00").format("LL")
     },
     {
-        _id: "nSMưGnDsdeobUMm6671v1Zjv",
-        date: "Thứ 3",
-        subject: "Giáo dục",
-        startDate: moment("6", "hh:mm:ss").format("LTS"),
-        endDate: moment("9", "hh:mm:ss").format("LTS"),
-        room: "103"
+        _id: "TvrmI9Q20pa0CFWoh067Yt8cv",
+        fullName: "Nguyễn Thị Mai",
+        unitName: "Trường Nội Duệ",
+        time: moment("2024-09-21T16:20:58.461+00:00").format("LL")
     },
     {
-        _id: "nSMưGnDsdeobUMm6671v1Zjv",
-        date: "Thứ 3",
-        subject: "Anh",
-        startDate: moment("9", "hh:mm:ss").format("LTS"),
-        endDate: moment("12", "hh:mm:ss").format("LTS"),
-        room: "201"
+        _id: "dupJErnAODtLUzK52b9AFjKG",
+        fullName: "Nguyên Lan Phương",
+        unitName: "Trường Ngô Gia Tự",
+        time: moment("2024-10-22T16:20:58.461+00:00").format("LL")
     },
     {
-        _id: "nSMưGnDsdeobUMm6671v1Zjv",
-        date: "Thứ 4",
-        subject: "Lịch sử",
-        startDate: moment("9", "hh:mm:ss").format("LTS"),
-        endDate: moment("9", "hh:mm:ss").format("LTS"),
-        room: "102"
+        _id: "jưjMTETc3mmdLkDzVkiYbhCKv",
+        fullName: "Nguyễn Thị Trang",
+        unitName: "Trường Lý Thái Tổ",
+        time: moment("2025-01-11T16:20:58.461+00:00").format("LL")
     }]);
 
-
-
-    const handleDeleteApplication = async (id) => {
-        setIsLoading(true);
-        const data = dataSource.filter(item => item._id !== id);
-        setDataSource(data);
-        notification.success({
-            message: "Update success",
-            description: "Xoá tuyển dụng thánh công"
-        });
-        setIsLoading(false);
-    }
 
     const columns = [
         {
@@ -75,7 +53,7 @@ const SchedulePage = () => {
             }
         },
         {
-            title: 'Mã lịch',
+            title: 'Mã công tác',
             dataIndex: "_id",
             render: (text, record) => {
                 return (
@@ -84,24 +62,16 @@ const SchedulePage = () => {
             }
         },
         {
-            title: 'Ngày dạy',
-            dataIndex: "date",
+            title: 'Mã nhân viên',
+            dataIndex: "fullName",
         },
         {
-            title: 'Môn học',
-            dataIndex: "subject",
+            title: 'Tên đơn vị',
+            dataIndex: "unitName",
         },
         {
-            title: 'Thời gian bắt đầu',
-            dataIndex: "startDate",
-        },
-        {
-            title: 'Thời gian kết thúc',
-            dataIndex: "endDate"
-        },
-        {
-            title: 'Phòng học',
-            dataIndex: "room"
+            title: 'Thời gian',
+            dataIndex: "time",
         },
         {
             title: 'Mô tả',
@@ -135,11 +105,18 @@ const SchedulePage = () => {
         <>
             <div className="row m-3">
                 <div className="col text-left">
-                    <Title level={4}>Lịch dạy</Title>
+                    <Title level={4}>Công Tác</Title>
                 </div>
 
+                <div className="col text-end">
+                    <Button
+                        type="primary"
+                        onClick={() => { setVisible(true) }}
+                        icon={<IoIosAdd size={20} />}
+                    >
+                        Thêm</Button>
+                </div>
             </div >
-
             <Table
                 loading={isLoading}
                 columns={columns}
@@ -156,7 +133,7 @@ const SchedulePage = () => {
                 rowKey="_id"
             />
 
-            <ToggleModalSchedule
+            <ToggleModalCollaborate
                 visible={visible}
                 dataSelected={dataSelected}
                 onClose={() => {
@@ -170,4 +147,4 @@ const SchedulePage = () => {
     );
 }
 
-export default SchedulePage;
+export default CollaboratePage;

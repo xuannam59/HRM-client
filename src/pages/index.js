@@ -13,6 +13,7 @@ import PersonalInfoPage from "./PersonalInfoPage"
 import ResetPasswordPage from "./ResetPasswordPage"
 import ApplicationPage from "./ApplicationPage"
 import SchedulePage from "./SchedulePage"
+import CollaboratePage from "./CollaboratePage"
 
 
 export {
@@ -31,4 +32,5 @@ export {
   ApplicationPage,
   ErrorPage,
   SchedulePage,
+  CollaboratePage
 }
