@@ -1,4 +1,4 @@
-import { Avatar, DatePicker, Form, Input, InputNumber, Modal, notification, Radio, Select } from "antd";
+import { Avatar, DatePicker, Form, Input, InputNumber, Modal, notification, Radio, Select, Space } from "antd";
 import { useEffect, useState } from "react";
 import handleApi from "../api/handleAPI";
 import { uploadFile } from "../utils/uploadFile.util";
@@ -107,6 +107,9 @@ const ToggleModal = (props) => {
 
     const onFinish = async (values) => {
         setIsLoading(true);
+        if (typeof values.schedul === "object") {
+            values.schedule = values.schedule.join(",");
+        }
         const data = values;
         const api = `/employees/${employeeSelected ? `update/${employeeSelected._id}` : "create"}`;
         data.birthday = moment(data.birthday).format();
@@ -137,6 +140,7 @@ const ToggleModal = (props) => {
         } finally {
             setIsLoading(false);
         }
+        setIsLoading(false);
     }
     return (
         <>
@@ -229,22 +233,7 @@ const ToggleModal = (props) => {
                         </div>
                     </div>
                     <div className="row">
-                        <div className="col-3 pe-0">
-                            <Form.Item
-                                name={"passport"}
-                                label="CCCD"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "Vui lòng nhập CCCD!"
-                                    }
-                                ]}
-                            >
-
-                                <Input placeholder="CCCD" disabled={employeeSelected ? true : false} />
-                            </Form.Item>
-                        </div>
-                        <div className="col-4 pe-0">
+                        <div className="col pe-0">
                             <Form.Item
                                 name={"phoneNumber"}
                                 label="Số điện thoại"
@@ -261,99 +250,50 @@ const ToggleModal = (props) => {
                                 />
                             </Form.Item>
                         </div>
-                        <div className="col-5">
-                            <Form.Item
-                                name={"email"}
-                                label="Email"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "Vui lòng nhập email!"
-                                    },
-                                    {
-                                        type: "email",
-                                        message: "Email không đúng định dạng!"
-                                    }
-                                ]}
-                            >
-                                <Input placeholder="Email" />
-                            </Form.Item>
-                        </div>
                     </div>
-                    <div className="row">
-                        <div className="col">
-                            <Form.Item
-                                style={{ marginBottom: 0 }}
-                                name={"levelId"}
-                                label="Trình độ"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "Vui lòng không để trống!"
-                                    }
-                                ]}
-                            >
-                                <Select
-                                    options={levels}
-                                    placeholder="Trình độ"
-                                />
-                            </Form.Item>
-                        </div>
-                        <div className="col">
-                            <Form.Item
-                                style={{ marginBottom: 0 }}
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "Vui lòng không để trống!"
-                                    }
-                                ]}
-                                name={"specializeId"}
-                                label="Chuyên môn"
-                            >
-                                <Select
-                                    options={specialize}
-                                    placeholder="Chuyên môn"
-                                />
-                            </Form.Item>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col">
-                            <Form.Item
-                                style={{ marginBottom: 0 }}
-                                name={"departmentId"}
-                                label="Phòng ban"
-                            >
-                                <Select
-                                    options={department}
-                                    placeholder="Phòng ban"
-                                />
-                            </Form.Item>
-                        </div>
-                        <div className="col">
-                            <Form.Item
-                                name={"positionId"}
-                                label="Chức vụ"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "Vui lòng không để trống!"
-                                    }
-                                ]}
-                            >
-                                <Select
-                                    options={positions}
-                                    placeholder="Chức vụ"
-                                />
-                            </Form.Item>
-                        </div>
-                    </div>
+                    <Form.Item
+                        name={"schedule"}
+                        label="Lịch dạy"
+                    >
+                        <Select
+                            mode="multiple"
+                            style={{
+                                width: '100%',
+                            }}
+                            placeholder="Lịch dạy"
+                            options={[
+                                {
+                                    label: 'Thứ 2',
+                                    value: 'Thứ 2',
+                                },
+                                {
+                                    label: 'Thứ 3',
+                                    value: 'Thứ 3',
+                                },
+                                {
+                                    label: 'Thứ 4',
+                                    value: 'Thứ 4',
+                                },
+                                {
+                                    label: 'Thứ 5',
+                                    value: 'Thứ 5',
+                                },
+                                {
+                                    label: 'Thứ 6',
+                                    value: 'Thứ 6',
+                                },
+                                {
+                                    label: 'Thứ 7',
+                                    value: 'Thứ 7',
+                                },
+                            ]}
+                        />
+                    </Form.Item>
                     <Form.Item
                         name={"address"}
                         label="Địa chỉ"
                     >
-                        <TextArea placeholder="Địa chỉ" rows={1} />
+                        <TextArea placeholder="Địa chỉ" rows={4} />
                     </Form.Item>
                     <Form.Item
                         name="status"
@@ -361,7 +301,7 @@ const ToggleModal = (props) => {
                     >
                         <Radio.Group optionType="button" buttonStyle="solid" value={"active"}>
                             <Radio value={"active"} >Làm việc</Radio>
-                            <Radio value={"inactive"}>Nghỉ việc</Radio>
+                            <Radio value={"inactive"}>Đang sử lý</Radio>
                         </Radio.Group>
                     </Form.Item>
 

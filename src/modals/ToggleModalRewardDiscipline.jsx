@@ -1,11 +1,11 @@
-import { DatePicker, Form, Input, Modal, notification, Select } from "antd";
+import { DatePicker, Form, Input, InputNumber, Modal, notification, Select } from "antd";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { authSelector } from "../redux/reducers/authReducer";
 import { generateString } from "../utils/generateString.util";
 
-const ToggleModalSchedule = (props) => {
+const ToggleModalRewardDiscipline = (props) => {
     const {
         visible, onClose,
         setDataSource, dataSource,
@@ -28,21 +28,28 @@ const ToggleModalSchedule = (props) => {
         // Push vào phần tử
         const data = dataSource;
         if (!dataSelected) {
-            data.push(values)
+            data.push({
+                ...values,
+                date: new Date()
+            })
             setDataSource(data);
         } else {
             const index = data.findIndex(item => item._id === dataSelected._id);
-            data[index] = values;
-
+            data[index] = {
+                _id: values._id,
+                date: values.date,
+                subject: values.subject,
+                room: values.room
+            };
 
             setDataSource(data);
         }
         notification.success(dataSelected ? {
             message: "Update success",
-            description: "Cập nhập tuyển dụng thánh công"
+            description: "Cập nhập phần thưởng thánh công"
         } : {
             message: "Create success",
-            description: "Thêm mới tuyển dụng thánh công"
+            description: "Thêm mới phần thưởng thánh công"
         })
         handleCancel();
         setIsLoading(false);
@@ -55,7 +62,7 @@ const ToggleModalSchedule = (props) => {
     return (<>
         <Modal
             closable={!isLoading}
-            title={dataSelected ? "Cập nhập lịch" : "Thêm lịch"}
+            title={dataSelected ? "Cập nhập Thưởng & kỷ luật" : "Thêm Thưởng & kỷ luật"}
             open={visible}
             onCancel={handleCancel}
             onOk={() => form.submit()}
@@ -80,7 +87,7 @@ const ToggleModalSchedule = (props) => {
             >
                 <Form.Item
                     name={"_id"}
-                    label={"Mã lịch"}
+                    label={"Mã phần thưởng"}
                     rules={[
                         {
                             required: true,
@@ -92,8 +99,8 @@ const ToggleModalSchedule = (props) => {
                     <Input disabled={true} />
                 </Form.Item>
                 <Form.Item
-                    name={"date"}
-                    label={"Ngày dạy"}
+                    name={"fullName"}
+                    label={"Tên nhân viên"}
                     rules={[
                         {
                             required: true,
@@ -101,19 +108,57 @@ const ToggleModalSchedule = (props) => {
                         }
                     ]}
                 >
-
                     <Select options={[
-                        { value: 'Thứ 2', label: 'Thứ 2' },
-                        { value: 'Thứ 3', label: 'Thứ 3' },
-                        { value: 'Thứ 4', label: 'Thứ 4' },
-                        { value: 'Thứ 5', label: 'Thứ 5' },
-                        { value: 'Thứ 6', label: 'Thứ 6' },
-                        { value: 'Thứ 7', label: 'Thứ 7' },
-                    ]} placeholder="Ngày dạy" />
+                        { value: 'Lê Văn E', label: 'Lê Văn E' },
+                        { value: 'Nam Lê', label: 'Nam Lê' },
+                        { value: 'Lê Văn B', label: 'Lê Văn B' },
+                        { value: 'Lê Văn A', label: 'Lê Văn A' },
+                    ]} placeholder="Nhân viên" />
                 </Form.Item>
+                <div className="row">
+                    <div className="col-6">
+                        <Form.Item
+                            name={"types"}
+                            label={"Loại"}
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Vui không được để trống!"
+                                }
+                            ]}
+                        >
+
+                            <Select options={[
+                                { value: 'bonus', label: 'Thưởng' },
+                                { value: 'punish', label: 'Kỷ luật' },
+                            ]} placeholder="Nhân viên" />
+                        </Form.Item>
+                    </div>
+                    <div className="col-6">
+                        <Form.Item
+                            name={"money"}
+                            label={"Số tiền"}
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Vui không được để trống!"
+                                }
+                            ]}
+                        >
+
+                            <InputNumber
+                                formatter={(value) => `đ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={(value) => value?.replace(/đ\s?|(,*)/g, '')}
+                                style={{
+                                    width: '100%',
+                                }}
+                            />
+                        </Form.Item>
+                    </div>
+                </div>
                 <Form.Item
-                    name={"subject"}
-                    label={"Môn dạy"}
+                    name={"content"}
+                    label={"Nội dung"}
                     rules={[
                         {
                             required: true,
@@ -122,55 +167,7 @@ const ToggleModalSchedule = (props) => {
                     ]}
                 >
 
-                    <Input placeholder="Họ tên" />
-                </Form.Item>
-                <Form.Item
-                    name={"startDate"}
-                    label={"Thời gian bắt đầu"}
-                    rules={[
-                        {
-                            required: true,
-                            message: "Vui không được để trống!"
-                        }
-                    ]}
-                >
-
-                    <Input placeholder="Thời gian bắt đầu" />
-                </Form.Item>
-
-                <Form.Item
-                    name={"endDate"}
-                    label={"Thời gian kết thúc"}
-                    rules={[
-                        {
-                            required: true,
-                            message: "Vui không được để trống!"
-                        }
-                    ]}
-                >
-
-                    <Input placeholder="Thời gian kết thúc" />
-                </Form.Item>
-
-                <Form.Item
-                    name={"room"}
-                    label={"Phòng"}
-                    rules={[
-                        {
-                            required: true,
-                            message: "Vui không được để trống!"
-                        }
-                    ]}
-                >
-
-                    <Select options={[
-                        { value: '101', label: '101' },
-                        { value: '102', label: '102' },
-                        { value: '103', label: '103' },
-                        { value: '201', label: '201' },
-                        { value: '202', label: '202' },
-                        { value: '203', label: '203' },
-                    ]} placeholder="Phòng" />
+                    <Input placeholder="Nội dung" />
                 </Form.Item>
                 <Form.Item
                     name={"description"}
@@ -206,4 +203,4 @@ const ToggleModalSchedule = (props) => {
     </>);
 }
 
-export default ToggleModalSchedule;
+export default ToggleModalRewardDiscipline;

@@ -24,10 +24,10 @@ const SiderComponent = () => {
         if (location && location.pathname) {
             const allRoute = [
                 "dashboard", "employee", 'student',
-                'class', "position", "level",
+                'class', "position", "level", "user",
                 "specialize", "department", "application",
                 "schedule", "collaborate", "fostering",
-                "salary",];
+                "salary", "rewardDiscipline"];
             const currentRoute = allRoute.find((item) => location.pathname.split("/")[1] === item);
             if (currentRoute) {
                 setCurrent(currentRoute);
@@ -48,36 +48,42 @@ const SiderComponent = () => {
             icon: <FiPieChart size={20} />
         },
         {
-            label: "Quản lý nhân viên",
+            key: "employee",
+            label: <Link to={"/employee"}>Quản lý nhân viên</Link>,
             icon: <PiUsersThree size={25} />,
-            children: [
-                {
-                    key: "employee",
-                    label: <Link to={"/employee"}>Nhân viên</Link>,
-                    icon: <FaRegUser size={18} />,
-                },
-                {
-                    key: "position",
-                    label: <Link to={"/position"}>Chức vụ</Link>,
-                    icon: <LiaUserTieSolid size={20} />,
-                },
-                {
-                    key: "level",
-                    label: <Link to={"/level"}>Trình độ</Link>,
-                    icon: <LuGraduationCap size={20} />,
-                },
-                {
-                    key: "specialize",
-                    label: <Link to={"/specialize"}>Chuyên môn</Link>,
-                    icon: <LuUserCog2 size={20} />,
-                },
-            ]
+            // children: [
+            //     {
+            //         key: "employee",
+            //         label: <Link to={"/employee"}>Nhân viên</Link>,
+            //         icon: <FaRegUser size={18} />,
+            //     },
+            //     {
+            //         key: "position",
+            //         label: <Link to={"/position"}>Chức vụ</Link>,
+            //         icon: <LiaUserTieSolid size={20} />,
+            //     },
+            //     {
+            //         key: "level",
+            //         label: <Link to={"/level"}>Trình độ</Link>,
+            //         icon: <LuGraduationCap size={20} />,
+            //     },
+            //     {
+            //         key: "specialize",
+            //         label: <Link to={"/specialize"}>Chuyên môn</Link>,
+            //         icon: <LuUserCog2 size={20} />,
+            //     },
+            // ]
         },
         {
-            key: "department",
-            label: <Link to={"/department"}>Quản lý phòng ban</Link>,
-            icon: <ImTree size={20} />,
+            key: "user",
+            label: <Link to={"/user"}>Quản lý người dùng</Link>,
+            icon: <FaRegUser size={18} />,
         },
+        // {
+        //     key: "department",
+        //     label: <Link to={"/department"}>Quản lý phòng ban</Link>,
+        //     icon: <ImTree size={20} />,
+        // },
         {
             key: "application",
             label: <Link to={"/application"}>Quản lý tuyển dụng</Link>,
@@ -99,20 +105,9 @@ const SiderComponent = () => {
             icon: <BsClipboard2CheckFill size={20} />,
         },
         {
-            label: "Khen thưởng và kỷ luật",
+            key: "rewardDiscipline",
+            label: <Link to={"/reward-discipline"}>Khen thưởng và kỷ luật</Link>,
             icon: <FaMoneyBillTransfer size={20} />,
-            children: [
-                {
-                    key: "reward",
-                    label: <Link to={"/reward"}>Khen thưởng</Link>,
-                    icon: <GiReceiveMoney size={18} />,
-                },
-                {
-                    key: "discipline",
-                    label: <Link to={"/discipline"}>Kỷ luật</Link>,
-                    icon: <GiPayMoney size={18} />,
-                }
-            ]
         },
         {
             key: "salary",

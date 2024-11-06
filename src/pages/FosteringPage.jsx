@@ -1,56 +1,51 @@
 import { useState } from "react";
-import { Button, notification, Popconfirm, Space, Table, Tooltip, Typography } from "antd";
-import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
-import { IoIosAdd } from "react-icons/io";
-import ToggleModalSchedule from "../modals/ToggleModalSchedule";
+import { Button, notification, Popconfirm, Space, Table, Tag, Tooltip, Typography } from "antd";
+import { MdOutlineEdit } from "react-icons/md";
 import moment from "moment";
 import Link from "antd/es/typography/Link";
+import ToggleModalFostering from "../modals/ToggleModalFostering";
+import { IoIosAdd } from "react-icons/io";
 
 const { Title } = Typography;
 
-const SchedulePage = () => {
+const FosteringPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [visible, setVisible] = useState(false);
     const [dataSelected, setDataSelected] = useState(undefined);
     const [dataSource, setDataSource] = useState([{
         _id: "nSMưGdssdeobUMm6671v1Zjv",
-        date: "Thứ 2",
+        teacher: "Lê Văn E",
         subject: "Toán",
-        startDate: "6",
-        endDate: "9",
-        room: "102"
+        schedule: "Thứ 2",
+        status: "active"
     },
     {
         _id: "0gMl9WgIgrwsf5G3scxoj0a7R",
-        date: "Thứ 2",
+        teacher: "Lê Văn B",
         subject: "Văn",
-        startDate: "9",
-        endDate: "12",
-        room: "102"
+        schedule: "Thứ 3",
+        status: "active"
     },
     {
         _id: "nSMưGnDsdeobUMm6671v1Zjv",
-        date: "Thứ 3",
+        teacher: "Lê Văn A",
         subject: "Giáo dục",
-        startDate: "6",
-        endDate: "9",
-        room: "103"
+        schedule: "Thứ 3",
+        status: "active"
     },
     {
         _id: "nSMưGnDsưdabUMm6671v1Zjv",
-        date: "Thứ 3",
+        teacher: "Lê Văn C",
         subject: "Anh",
-        startDate: "9",
-        endDate: "12",
-        room: "201"
+        schedule: "Thứ 4",
+        status: "inactive"
     },
     {
         _id: "nSMưGnDsdeobUMm6671ưeZjv",
-        date: "Thứ 4",
+        teacher: "Thứ 4",
         subject: "Lịch sử",
-        startDate: "9",
-        endDate: "9",
-        room: "102"
+        schedule: "Thứ 6",
+        status: "active"
     }]);
 
 
@@ -63,7 +58,7 @@ const SchedulePage = () => {
             }
         },
         {
-            title: 'Mã lịch',
+            title: 'Mã bồi dưỡng',
             dataIndex: "_id",
             render: (text, record) => {
                 return (
@@ -72,34 +67,29 @@ const SchedulePage = () => {
             }
         },
         {
-            title: 'Ngày dạy',
-            dataIndex: "date",
+            title: 'Giáo viên',
+            dataIndex: "teacher",
         },
         {
-            title: 'Môn học',
+            title: 'Môn bồi dưỡng',
             dataIndex: "subject",
         },
         {
-            title: 'Thời gian bắt đầu',
-            dataIndex: "startDate",
-            render: (text, record) => {
-                return moment(record.startDate, "hh:mm:ss").format("LTS")
-            }
+            title: 'Lịch bồi dưỡng',
+            dataIndex: "schedule",
         },
         {
-            title: 'Thời gian kết thúc',
-            dataIndex: "endDate",
+            title: 'trạng thái',
+            dataIndex: "status",
             render: (text, record) => {
-                return moment(record.endDate, "hh:mm:ss").format("LTS")
+                return (
+                    <Tag color={record.status === "active" ? "#87d068" : "#f50"}>{record.status === "active" ? "Hoạt động" : "Ngừng hoạt động"}</Tag>
+                )
             }
-        },
-        {
-            title: 'Phòng học',
-            dataIndex: "room"
         },
         {
             title: 'Mô tả',
-            dataIndex: "descriptions"
+            dataIndex: "description",
         },
         {
             title: "Action",
@@ -129,9 +119,8 @@ const SchedulePage = () => {
         <>
             <div className="row m-3">
                 <div className="col text-left">
-                    <Title level={4}>Lịch dạy</Title>
+                    <Title level={4}>Lịch bồi dưỡng</Title>
                 </div>
-
                 <div className="col text-end">
                     <Button
                         type="primary"
@@ -140,7 +129,6 @@ const SchedulePage = () => {
                     >
                         Thêm</Button>
                 </div>
-
             </div >
 
             <Table
@@ -159,7 +147,7 @@ const SchedulePage = () => {
                 rowKey="_id"
             />
 
-            <ToggleModalSchedule
+            <ToggleModalFostering
                 visible={visible}
                 dataSelected={dataSelected}
                 onClose={() => {
@@ -173,4 +161,4 @@ const SchedulePage = () => {
     );
 }
 
-export default SchedulePage;
+export default FosteringPage;

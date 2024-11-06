@@ -7,7 +7,11 @@ import {
     DepartmentPage, EmployeeDetail, DepartmentDetail,
     ResetPasswordPage, PersonalInfoPage, ApplicationPage,
     SchedulePage,
-    CollaboratePage
+    CollaboratePage,
+    UserPage,
+    FosteringPage,
+    RewardDisciplinePage,
+    SalaryPage
 } from "../pages";
 
 const { Header, Sider, Content, Footer } = Layout;
@@ -25,6 +29,7 @@ const MainRouter = () => {
                                 <Route path="/login" element={<Navigate to="/dashboard" />} />
                                 <Route path="/dashboard" element={<HomePage />} />
                                 <Route path="/employee" element={<EmployeePage />} />
+                                <Route path="/user" element={<UserPage />} />
                                 <Route path="/employee/detail/:id" element={<EmployeeDetail />} />
                                 <Route path="/position" element={<PositionPage />} />
                                 <Route path="/level" element={<LevelPage />} />
@@ -36,6 +41,9 @@ const MainRouter = () => {
                                 <Route path="/application" element={<ApplicationPage />} />
                                 <Route path="/schedule" element={<SchedulePage />} />
                                 <Route path="/collaborate" element={<CollaboratePage />} />
+                                <Route path="/fostering" element={<FosteringPage />} />
+                                <Route path="/reward-discipline" element={<RewardDisciplinePage />} />
+                                <Route path="/salary" element={<SalaryPage />} />
 
 
                                 <Route path="*" element={<Navigate to="/404" />} />

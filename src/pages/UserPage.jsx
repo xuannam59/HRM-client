@@ -1,21 +1,22 @@
-import { Avatar, Button, notification, Popconfirm, Radio, Space, Table, Tag, Tooltip, Typography } from "antd";
+import { Button, notification, Popconfirm, Radio, Space, Table, Tag, Tooltip, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { IoIosAdd } from "react-icons/io";
 import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
-import ToggleModal from "../../modals/ToggleModal";
-import handelAPI from "../../api/handleAPI";
+import ToggleModal from "../modals/ToggleModal";
+import handelAPI from "../api/handleAPI";
 import { Link } from "react-router-dom";
 import { FiDownload } from "react-icons/fi";
-import { exportExcel } from "../../utils/exportExcel.util";
+import { exportExcel } from "../utils/exportExcel.util";
 import moment from "moment";
+import UserModal from "../modals/UserModal";
 
 const { Title } = Typography;
 
-const EmployeePage = () => {
+const UserPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [visible, setVisible] = useState(false);
     const [dataSource, setDataSource] = useState([]);
-    const [employeeSelected, setEmployeeSelected] = useState();
+    const [userSelected, setUserSelected] = useState();
     const [current, setCurrent] = useState(1);
     const [pageSize, setPageSize] = useState(5);
     const [total, setTotal] = useState(0);
@@ -27,7 +28,7 @@ const EmployeePage = () => {
 
     const loadData = async () => {
         setIsLoading(true);
-        const api = `/employees?current=${current}&&pageSize=${pageSize}&&status=${status}`;
+        const api = `/auth?current=${current}&&pageSize=${pageSize}&&status=${status}`;
         try {
             const res = await handelAPI(api);
 
@@ -63,14 +64,14 @@ const EmployeePage = () => {
     }
 
     const handleDeleteEmployee = async (id) => {
-        const api = `/employees/delete/${id}`;
+        const api = `/user/delete/${id}`;
         try {
             const res = await handelAPI(api, "", "delete");
             if (res.data) {
                 loadData();
                 notification.success({
                     message: res.message,
-                    description: "Xoá nhân viên thành công"
+                    description: "Xoá nguời dùng thành công"
                 })
             } else {
                 notification.error({
@@ -92,17 +93,6 @@ const EmployeePage = () => {
             fixed: "left",
         },
         {
-            title: "Avatar",
-            render: (item, record) => {
-                return (
-                    <>
-                        <Avatar src={item.avatar} size={50} />
-                    </>
-                )
-            },
-            fixed: "left",
-        },
-        {
             title: 'Họ tên',
             render: (item) => {
                 return (
@@ -114,47 +104,12 @@ const EmployeePage = () => {
             fixed: "left",
         },
         {
-            title: "Giới tính",
-            dataIndex: "gender"
-        },
-        {
-            title: "Địa chỉ",
-            dataIndex: "address"
-        },
-        {
-            title: "Số điện thoại",
-            dataIndex: "phoneNumber"
+            title: "Email",
+            dataIndex: "email"
         },
         {
             title: "Vai trò",
             dataIndex: "role"
-        },
-        {
-            title: "Lịch dạy",
-            dataIndex: "schedule"
-        },
-        {
-            title: "Trạng thái",
-            dataIndex: "status",
-            render: (_, record) => {
-                let color, status;
-                switch (record.status) {
-                    case "active":
-                        color = "green";
-                        status = "Làm việc"
-                        break
-                    case "inactive":
-                        color = "red";
-                        status = "Nghỉ việc";
-                        break
-                    default:
-                        color = "#f50";
-                        status = "Updating";
-                }
-                return (
-                    <Tag color={color}>{status}</Tag>
-                )
-            }
         },
         {
             title: "Ngày tạo",
@@ -175,7 +130,8 @@ const EmployeePage = () => {
                                 type="link"
                                 icon={<MdOutlineEdit size={20} />}
                                 onClick={() => {
-                                    setEmployeeSelected(item);
+                                    console.log(item);
+                                    setUserSelected(item);
                                     setVisible(true);
                                 }}
                             />
@@ -219,16 +175,9 @@ const EmployeePage = () => {
         <>
             <div className="row m-3">
                 <div className="col text-left">
-                    <Title level={4}>Danh sách nhân viên</Title>
+                    <Title level={4}>Danh sách người dùng</Title>
                 </div>
 
-                <div className="col text-center">
-                    <Radio.Group onChange={(event) => onChangeStatus(event)} defaultValue={status} buttonStyle="solid">
-                        <Radio.Button value={""}>Tất cả</Radio.Button>
-                        <Radio.Button value={"active"}>Đang công tác</Radio.Button>
-                        <Radio.Button value={"inactive"}>Ngừng công tác</Radio.Button>
-                    </Radio.Group>
-                </div>
 
                 <div className="col text-end">
                     <Button
@@ -260,17 +209,17 @@ const EmployeePage = () => {
                 rowKey="_id"
             />
 
-            <ToggleModal
+            <UserModal
                 visible={visible}
                 loadData={loadData}
-                employeeSelected={employeeSelected}
+                userSelected={userSelected}
                 onClose={() => {
                     setVisible(false);
-                    setEmployeeSelected(undefined);
+                    setUserSelected(undefined);
                 }}
             />
         </>
     );
 }
 
-export default EmployeePage;
+export default UserPage;

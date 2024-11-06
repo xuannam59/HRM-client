@@ -99,15 +99,15 @@ const Login = () => {
                         loading={isLoading}
                     >Sign in</Button>
                 </div>
-                <SocialLogin />
-                <div className="mt-4 text-center">
+                {/* <SocialLogin /> */}
+                {/* <div className="mt-4 text-center">
                     <Space>
                         <Text type="secondary">
                             Don’t have an account?
                         </Text>
                         <Link to={"/sign-up"}>Sign up</Link>
                     </Space>
-                </div>
+                </div> */}
             </Card >
         </>
     );

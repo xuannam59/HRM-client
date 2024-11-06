@@ -2,6 +2,7 @@ import Login from "./auth/Login"
 import SignUp from "./auth/SignUp"
 import HomePage from "./HomePage"
 import EmployeePage from "./employees/EmployeePage"
+import UserPage from "./UserPage"
 import EmployeeDetail from "./employees/EmployeeDetail"
 import PositionPage from "./PositionPage"
 import LevelPage from "./LevelPage"
@@ -14,8 +15,12 @@ import ResetPasswordPage from "./ResetPasswordPage"
 import ApplicationPage from "./ApplicationPage"
 import SchedulePage from "./SchedulePage"
 import CollaboratePage from "./CollaboratePage"
+import FosteringPage from "./FosteringPage"
+import RewardDisciplinePage from "./RewardDisciplinePage"
+import SalaryPage from "./SalaryPage"
 
 
+RewardDisciplinePage
 export {
   Login,
   SignUp,
@@ -23,6 +28,7 @@ export {
   LevelPage,
   EmployeePage,
   EmployeeDetail,
+  UserPage,
   PositionPage,
   SpecializePage,
   DepartmentPage,
@@ -32,5 +38,8 @@ export {
   ApplicationPage,
   ErrorPage,
   SchedulePage,
-  CollaboratePage
+  CollaboratePage,
+  FosteringPage,
+  RewardDisciplinePage,
+  SalaryPage
 }
