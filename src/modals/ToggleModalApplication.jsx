@@ -1,49 +1,53 @@
 import { DatePicker, Form, Input, Modal, notification, Select } from "antd";
 import moment from "moment";
 import { useEffect, useState } from "react";
+import handleApi from "../api/handleAPI";
 import { useSelector } from "react-redux";
 import { authSelector } from "../redux/reducers/authReducer";
-import { generateString } from "../utils/generateString.util";
 
 const ToggleModalApplication = (props) => {
     const {
         visible, onClose,
-        setDataSource, dataSource,
-        applicationSelected
+        loadData, dataSelected
     } = props
 
     const user = useSelector(authSelector);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        if (applicationSelected) {
-            form.setFieldsValue(applicationSelected);
+        if (dataSelected) {
+            form.setFieldsValue(dataSelected);
         }
-    }, [applicationSelected]);
+    }, [dataSelected]);
 
     const [form] = Form.useForm();
 
     const onFinish = async (values) => {
         setIsLoading(true);
-        // Push vào phần tử
-        const data = dataSource;
-        if (!applicationSelected) {
-            data.push(values)
-            setDataSource(data);
-        } else {
-            const index = data.findIndex(item => item._id === applicationSelected._id);
-            data[index] = values;
-
-            setDataSource(data);
+        const api = `/applications/${dataSelected ? `update/${dataSelected._id}` : "create"}`;
+        try {
+            const res = await handleApi(api, values, `${dataSelected ? "patch" : "post"}`);
+            if (res.data) {
+                handleCancel();
+                loadData();
+                notification.success(dataSelected ? {
+                    message: "Updata Susseccfully",
+                    description: "Cập nhập đơn ứng tuyển thành công"
+                } : {
+                    message: "Create Susseccfully",
+                    description: "Tạo đơn ứng tuyển thành công"
+                });
+            } else {
+                notification.error({
+                    message: "Error",
+                    description: res.message
+                });
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsLoading(false);
         }
-        notification.success(applicationSelected ? {
-            message: "Update success",
-            description: "Cập nhập tuyển dụng thánh công"
-        } : {
-            message: "Create success",
-            description: "Thêm mới tuyển dụng thánh công"
-        })
-        handleCancel();
         setIsLoading(false);
     }
 
@@ -54,11 +58,11 @@ const ToggleModalApplication = (props) => {
     return (<>
         <Modal
             closable={!isLoading}
-            title={applicationSelected ? "Update application" : "Create application"}
+            title={dataSelected ? "Update application" : "Create application"}
             open={visible}
             onCancel={handleCancel}
             onOk={() => form.submit()}
-            okText={applicationSelected ? "Update" : "CREATE"}
+            okText={dataSelected ? "Update" : "CREATE"}
             okButtonProps={{
                 loading: isLoading
             }}
@@ -73,40 +77,7 @@ const ToggleModalApplication = (props) => {
                 form={form}
                 onFinish={onFinish}
                 disabled={isLoading}
-                initialValues={{
-                    "_id": !applicationSelected && generateString(25)
-                }}
             >
-                <Form.Item
-                    name={"_id"}
-                    label={"Mã tuyển dụng"}
-                    rules={[
-                        {
-                            required: true,
-                            message: "Vui không được để trống!"
-                        }
-                    ]}
-                >
-
-                    <Input disabled={true} />
-                </Form.Item>
-                <Form.Item
-                    name={"position"}
-                    label={"Vị trí tuyển dụng"}
-                    rules={[
-                        {
-                            required: true,
-                            message: "Vui không được để trống!"
-                        }
-                    ]}
-                >
-
-                    <Select options={[
-                        { label: 'Vị trí tuyển dụng', disabled: true },
-                        { value: 'Giáo viên', label: 'Giáo viên' },
-                        { value: 'Kế Toán', label: 'Kế Toán' },
-                    ]} placeholder="Vị trí tuyển dụng" />
-                </Form.Item>
                 <Form.Item
                     name={"fullName"}
                     label={"Họ tên"}
@@ -118,7 +89,7 @@ const ToggleModalApplication = (props) => {
                     ]}
                 >
 
-                    <Input placeholder="Họ tên" />
+                    <Input placeholder="Họ tên" disabled={dataSelected ? true : false} />
                 </Form.Item>
                 <Form.Item
                     name={"email"}
@@ -127,13 +98,16 @@ const ToggleModalApplication = (props) => {
                         {
                             required: true,
                             message: "Vui không được để trống!"
+                        },
+                        {
+                            type: "email",
+                            message: "Email không đúng định dạng!"
                         }
                     ]}
                 >
 
-                    <Input placeholder="Email" />
+                    <Input placeholder="Email" disabled={dataSelected ? true : false} />
                 </Form.Item>
-
                 <Form.Item
                     name={"phoneNumber"}
                     label={"Số điện thoại"}
@@ -145,12 +119,53 @@ const ToggleModalApplication = (props) => {
                     ]}
                 >
 
-                    <Input placeholder="Số điện thoại" />
+                    <Input placeholder="Số điện thoại" disabled={dataSelected ? true : false} />
                 </Form.Item>
+                <div className="row">
+                    <div className="col-6">
+                        <Form.Item
+                            name={"position"}
+                            label={"Vị trí tuyển dụng"}
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Vui không được để trống!"
+                                }
+                            ]}
+                        >
 
+                            <Select options={[
+                                { label: 'Vị trí tuyển dụng', disabled: true },
+                                { value: 'Giáo viên', label: 'Giáo viên' },
+                                { value: 'Kế Toán', label: 'Kế Toán' },
+                            ]} placeholder="Vị trí tuyển dụng" disabled={dataSelected ? true : false} />
+                        </Form.Item>
+                    </div>
+                    <div className="col-6">
+                        <Form.Item
+                            name={"status"}
+                            label={"Trạng thái"}
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Vui không được để trống!"
+                                }
+                            ]}
+                        >
+                            <Select options={[
+                                { label: 'Trạng thái', disabled: true },
+                                { value: 'PENDING', label: 'PENDING' },
+                                { value: 'REVIEWING', label: 'REVIEWING' },
+                                { value: 'APPROVED', label: 'APPROVED' },
+                                { value: 'REJECTED', label: 'REJECTED' },
+                            ]} placeholder="Vị trí tuyển dụng" />
+
+                        </Form.Item>
+                    </div>
+                </div>
                 <Form.Item
                     name={"address"}
-                    label={"địa chỉ"}
+                    label={"Địa chỉ"}
                     rules={[
                         {
                             required: true,
@@ -159,7 +174,7 @@ const ToggleModalApplication = (props) => {
                     ]}
                 >
 
-                    <Input placeholder="địa chỉ" />
+                    <Input placeholder="Địa chỉ" />
                 </Form.Item>
                 <Form.Item
                     name={"description"}

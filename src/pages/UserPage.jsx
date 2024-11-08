@@ -33,10 +33,6 @@ const UserPage = () => {
             const res = await handelAPI(api);
 
             if (res.data) {
-                res.data.forEach(item => {
-                    item.createdAt = moment(item.createdAt).format("DD/MM/YYYY");
-                    item.updatedAt = moment(item.updatedAt).format("DD/MM/YYYY");
-                });
                 setDataSource(res.data);
                 setCurrent(res.meta.current);
                 setPageSize(res.meta.pageSize);
@@ -56,11 +52,6 @@ const UserPage = () => {
         if (pagination.pageSize && pagination.pageSize !== pageSize) {
             setPageSize(pagination.pageSize);
         }
-    }
-
-    const onChangeStatus = (event) => {
-        setStatus(event.target.value);
-        setCurrent(1);
     }
 
     const handleDeleteEmployee = async (id) => {
@@ -93,14 +84,18 @@ const UserPage = () => {
             fixed: "left",
         },
         {
-            title: 'Họ tên',
-            render: (item) => {
+            title: 'Mã người dùng',
+            dataIndex: "_id",
+            render: (text) => {
                 return (
-                    <>
-                        <Link to={`/employee/detail/${item._id}`} >{item.fullName}</Link>
-                    </>
-                );
-            },
+                    <Link>{text}</Link>
+                )
+            }
+
+        },
+        {
+            title: 'Họ tên',
+            dataIndex: "fullName",
             fixed: "left",
         },
         {
@@ -113,11 +108,17 @@ const UserPage = () => {
         },
         {
             title: "Ngày tạo",
-            dataIndex: "createdAt"
+            dataIndex: "createdAt",
+            render: (text) => {
+                return (moment(text).format("DD/MM/YYYY"))
+            }
         },
         {
             title: "Ngày cập nhập",
-            dataIndex: "updatedAt"
+            dataIndex: "updatedAt",
+            render: (text) => {
+                return (moment(text).format("DD/MM/YYYY"))
+            }
         },
         {
             title: "Action",

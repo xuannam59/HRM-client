@@ -1,55 +1,45 @@
-import { useState } from "react";
-import { Button, notification, Popconfirm, Space, Table, Tooltip, Typography } from "antd";
+import { useEffect, useState } from "react";
+import { Button, notification, Popconfirm, Space, Table, Tag, Tooltip, Typography } from "antd";
 import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
 import { IoIosAdd } from "react-icons/io";
 import ToggleModalApplication from "../modals/ToggleModalApplication";
+import handelAPI from "../api/handleAPI";
+import moment from "moment";
+import Link from "antd/es/typography/Link";
 
 const { Title } = Typography;
 
 const ApplicationPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [visible, setVisible] = useState(false);
-    const [applicationSelected, setApplicationSelected] = useState(undefined);
-    const [dataSource, setDataSource] = useState([{
-        _id: "nSMưGnD6kDobUMm6671v1Zjv",
-        fullName: "Lê Văn A",
-        email: "levana@gmail.com",
-        position: "Giáo viên",
-        phoneNumber: "123456789",
-        address: "Bắc Ninh",
-        description: "ứng tuyển vị trí giáo viên",
-    },
-    {
-        _id: "0gMl9WgIm1JuY5G3scxoj0a7R",
-        fullName: "Lê Văn B",
-        email: "levanb@gmail.com",
-        position: "Giáo viên",
-        phoneNumber: "123456789",
-        address: "Bắc Ninh",
-        description: "ứng tuyển vị trí nhân viên giáo viên",
-    },
-    {
-        _id: "gUWve7YBx6ejImaoASn0HvXdW",
-        fullName: "Lê Văn C",
-        email: "levanb@gmail.com",
-        position: "Kế toán",
-        phoneNumber: "123456789",
-        address: "Bắc Ninh",
-        description: "ứng tuyển vị trí nhân viên kế toán",
-    },
-    ]);
+    const [dataSelected, setDataSelected] = useState(undefined);
+    const [current, setCurrent] = useState(1);
+    const [pageSize, setPageSize] = useState(5);
+    const [total, setTotal] = useState(0);
+    const [dataSource, setDataSource] = useState([]);
+
+    useEffect(() => {
+        loadData();
+    }, [current, pageSize, status]);
 
 
-
-    const handleDeleteApplication = async (id) => {
+    const loadData = async () => {
         setIsLoading(true);
-        const data = dataSource.filter(item => item._id !== id);
-        setDataSource(data);
-        notification.success({
-            message: "Update success",
-            description: "Xoá tuyển dụng thánh công"
-        });
-        setIsLoading(false);
+        const api = `/applications?current=${current}&&pageSize=${pageSize}&&status=${status}`;
+        try {
+            const res = await handelAPI(api);
+
+            if (res.data) {
+                setDataSource(res.data);
+                setCurrent(res.meta.current);
+                setPageSize(res.meta.pageSize);
+                setTotal(res.meta.total);
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     const columns = [
@@ -61,12 +51,14 @@ const ApplicationPage = () => {
             }
         },
         {
-            title: 'Mã Tuyển dụng',
+            title: 'Mã tuyển dụng',
             dataIndex: "_id",
-        },
-        {
-            title: 'vị trí tuyển dụng',
-            dataIndex: "position",
+            render: (text) => {
+                return (
+                    <Link>{text}</Link>
+                )
+            }
+
         },
         {
             title: 'Họ tên',
@@ -81,12 +73,38 @@ const ApplicationPage = () => {
             dataIndex: "phoneNumber",
         },
         {
+            title: 'Vị trí tuyển dụng',
+            dataIndex: "position",
+        },
+        {
+            title: 'Tình trạng',
+            dataIndex: "status",
+            render: (text, record) => {
+                return (
+                    <Tag color={
+                        record.status === "APPROVED" ? "#87d068"
+                            : record.status === "REJECTED" ? "#f50" : "#2db7f5"
+                    }>
+                        {record.status}
+                    </Tag>
+                )
+            }
+
+        },
+        {
             title: 'Địa chỉ',
             dataIndex: "address",
         },
         {
             title: 'Mô tả',
             dataIndex: "description"
+        },
+        {
+            title: 'Ngày tạo',
+            dataIndex: "createAt",
+            render: (text, record) => {
+                return (moment(record.createAt).format("DD/MM/YYYY"))
+            }
         },
         {
             title: "Action",
@@ -99,7 +117,7 @@ const ApplicationPage = () => {
                                 type="link"
                                 icon={<MdOutlineEdit size={20} />}
                                 onClick={() => {
-                                    setApplicationSelected(record);
+                                    setDataSelected(record);
                                     setVisible(true);
                                 }}
                             />
@@ -113,7 +131,6 @@ const ApplicationPage = () => {
                             okText="Yes"
                             cancelText="No"
                         >
-
                             <Button
                                 type="text"
                                 icon={<MdOutlineDeleteForever size={20} />}
@@ -127,7 +144,26 @@ const ApplicationPage = () => {
 
     ];
 
-
+    const handleDeleteApplication = async (id) => {
+        const api = `/applications/delete/${id}`;
+        try {
+            const res = await handelAPI(api, "", "delete");
+            if (res.data) {
+                loadData();
+                notification.success({
+                    message: res.message,
+                    description: "Xoá Đơn ứng tuyển thành công"
+                })
+            } else {
+                notification.error({
+                    message: "Delete Error",
+                    description: res.message,
+                })
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
     return (
         <>
             <div className="row m-3">
@@ -162,11 +198,12 @@ const ApplicationPage = () => {
 
             <ToggleModalApplication
                 visible={visible}
-                applicationSelected={applicationSelected}
+                dataSelected={dataSelected}
                 onClose={() => {
                     setVisible(false);
-                    setApplicationSelected(undefined);
+                    setDataSelected(undefined);
                 }}
+                loadData={loadData}
                 dataSource={dataSource}
                 setDataSource={setDataSource}
             />

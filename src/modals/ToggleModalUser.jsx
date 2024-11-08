@@ -1,13 +1,10 @@
-import { Avatar, DatePicker, Form, Input, InputNumber, Modal, notification, Radio, Select, Space } from "antd";
+import { DatePicker, Form, Input, Modal, notification, Select } from "antd";
 import { useEffect, useState } from "react";
 import handleApi from "../api/handleAPI";
-import { uploadFile } from "../utils/uploadFile.util";
-import { replaceName } from "../utils/replaceName.util";
 import moment from 'moment';
 import { useSelector } from "react-redux";
 import { authSelector } from "../redux/reducers/authReducer";
 
-const { TextArea } = Input;
 
 const UserModal = (props) => {
     const { loadData,
@@ -72,11 +69,9 @@ const UserModal = (props) => {
 
     const onFinish = async (values) => {
         setIsLoading(true);
-        const data = values;
         const api = `/auth/${userSelected ? `update/${userSelected._id}` : "register"}`;
-        console.log(data)
         try {
-            const res = await handleApi(api, data, `${userSelected ? "patch" : "post"}`);
+            const res = await handleApi(api, values, `${userSelected ? "patch" : "post"}`);
             if (res.data) {
                 handleCancel();
                 loadData();
