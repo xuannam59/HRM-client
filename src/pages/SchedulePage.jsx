@@ -1,10 +1,12 @@
-import { useState } from "react";
-import { Button, notification, Popconfirm, Space, Table, Tooltip, Typography } from "antd";
+import { useEffect, useState } from "react";
+import { Button, notification, Popconfirm, Space, Table, Tag, Tooltip, Typography } from "antd";
 import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
 import { IoIosAdd } from "react-icons/io";
 import ToggleModalSchedule from "../modals/ToggleModalSchedule";
 import moment from "moment";
 import Link from "antd/es/typography/Link";
+import handelAPI from "../api/handleAPI";
+import dayjs from "dayjs";
 
 const { Title } = Typography;
 
@@ -12,47 +14,43 @@ const SchedulePage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [visible, setVisible] = useState(false);
     const [dataSelected, setDataSelected] = useState(undefined);
-    const [dataSource, setDataSource] = useState([{
-        _id: "nSMưGdssdeobUMm6671v1Zjv",
-        date: "Thứ 2",
-        subject: "Toán",
-        startDate: "6",
-        endDate: "9",
-        room: "102"
-    },
-    {
-        _id: "0gMl9WgIgrwsf5G3scxoj0a7R",
-        date: "Thứ 2",
-        subject: "Văn",
-        startDate: "9",
-        endDate: "12",
-        room: "102"
-    },
-    {
-        _id: "nSMưGnDsdeobUMm6671v1Zjv",
-        date: "Thứ 3",
-        subject: "Giáo dục",
-        startDate: "6",
-        endDate: "9",
-        room: "103"
-    },
-    {
-        _id: "nSMưGnDsưdabUMm6671v1Zjv",
-        date: "Thứ 3",
-        subject: "Anh",
-        startDate: "9",
-        endDate: "12",
-        room: "201"
-    },
-    {
-        _id: "nSMưGnDsdeobUMm6671ưeZjv",
-        date: "Thứ 4",
-        subject: "Lịch sử",
-        startDate: "9",
-        endDate: "9",
-        room: "102"
-    }]);
+    const [current, setCurrent] = useState(1);
+    const [pageSize, setPageSize] = useState(5);
+    const [total, setTotal] = useState(0);
+    const [dataSource, setDataSource] = useState([]);
 
+    useEffect(() => {
+        loadData();
+    }, [current, pageSize, status]);
+
+
+    const loadData = async () => {
+        setIsLoading(true);
+        const api = `/schedules?current=${current}&&pageSize=${pageSize}`;
+        try {
+            const res = await handelAPI(api);
+
+            if (res.data) {
+                setDataSource(res.data);
+                setCurrent(res.meta.current);
+                setPageSize(res.meta.pageSize);
+                setTotal(res.meta.total);
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    const onChangeTable = (pagination, filters, sorter, extra) => {
+        if (pagination.current && pagination.current !== current) {
+            setCurrent(pagination.current);
+        }
+        if (pagination.pageSize && pagination.pageSize !== pageSize) {
+            setPageSize(pagination.pageSize);
+        }
+    }
 
     const columns = [
         {
@@ -72,26 +70,32 @@ const SchedulePage = () => {
             }
         },
         {
-            title: 'Ngày dạy',
-            dataIndex: "date",
+            title: 'Giáo viên',
+            render: (record) => {
+                return record.employeeId.fullName
+            }
+        },
+        {
+            title: 'Thứ',
+            dataIndex: "day",
         },
         {
             title: 'Môn học',
             dataIndex: "subject",
         },
         {
-            title: 'Thời gian bắt đầu',
-            dataIndex: "startDate",
+            title: 'Giờ bắt đầu',
             render: (text, record) => {
-                return moment(record.startDate, "hh:mm:ss").format("LTS")
-            }
+                return (<Tag color="lime">{dayjs(record.startTime).format("HH:mm:ss")}</Tag>)
+            },
+            align: "center"
         },
         {
-            title: 'Thời gian kết thúc',
-            dataIndex: "endDate",
+            title: 'Giờ kết thúc',
             render: (text, record) => {
-                return moment(record.endDate, "hh:mm:ss").format("LTS")
-            }
+                return (<Tag color="volcano">{dayjs(record.endTime).format("HH:mm:ss")}</Tag>)
+            },
+            align: "center"
         },
         {
             title: 'Phòng học',
@@ -122,7 +126,7 @@ const SchedulePage = () => {
                             placement="right"
                             title="Xoá Lịch"
                             description="Bạn chắc chắn xoá lịch này không"
-                            onConfirm={() => handleDeleteApplication(record._id)}
+                            onConfirm={() => handleDeleteSchedule(record._id)}
                             onCancel={""}
                             okText="Yes"
                             cancelText="No"
@@ -141,15 +145,25 @@ const SchedulePage = () => {
 
     ];
 
-    const handleDeleteApplication = async (id) => {
-        setIsLoading(true);
-        const data = dataSource.filter(item => item._id !== id);
-        setDataSource(data);
-        notification.success({
-            message: "Update success",
-            description: "Xoá Lịch thánh công"
-        });
-        setIsLoading(false);
+    const handleDeleteSchedule = async (id) => {
+        const api = `/schedules/delete/${id}`;
+        try {
+            const res = await handelAPI(api, "", "delete");
+            if (res.data) {
+                loadData();
+                notification.success({
+                    message: res.message,
+                    description: "Xoá lịch thành công"
+                })
+            } else {
+                notification.error({
+                    message: "Delete Error",
+                    description: res.message,
+                })
+            }
+        } catch (error) {
+            console.log(error);
+        }
     }
 
 
@@ -176,6 +190,9 @@ const SchedulePage = () => {
                 columns={columns}
                 dataSource={dataSource}
                 pagination={{
+                    current: current,
+                    pageSize: pageSize,
+                    total: total,
                     position: ["bottomCenter"],
                     showSizeChanger: true,
                     pageSizeOptions: [5, 10, 20, 50],
@@ -184,6 +201,7 @@ const SchedulePage = () => {
                 scroll={{
                     x: 'max-content'
                 }}
+                onChange={onChangeTable}
                 rowKey="_id"
             />
 
@@ -194,6 +212,7 @@ const SchedulePage = () => {
                     setVisible(false);
                     setDataSelected(undefined);
                 }}
+                loadData={loadData}
                 dataSource={dataSource}
                 setDataSource={setDataSource}
             />

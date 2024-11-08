@@ -199,60 +199,27 @@ const ToggleModal = (props) => {
                     <div className="row">
                         <div className="col-6">
                             <Form.Item
-                                name={"specialize"}
-                                label="Chuyên môn"
+                                name={"position"}
+                                label="Vị trí"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Vui lòng không để trống"
+                                    },
+                                ]}
                             >
-                                <Input placeholder="Chuyên môn" />
+                                <Input placeholder="Vị trí" />
                             </Form.Item>
                         </div>
                         <div className="col-6">
                             <Form.Item
-                                name={"schedule"}
-                                label="Lịch dạy"
+                                name={"address"}
+                                label="Địa chỉ"
                             >
-                                <Select
-                                    mode="multiple"
-                                    style={{
-                                        width: '100%',
-                                    }}
-                                    placeholder="Lịch dạy"
-                                    options={[
-                                        {
-                                            label: 'Thứ 2',
-                                            value: 'Thứ 2',
-                                        },
-                                        {
-                                            label: 'Thứ 3',
-                                            value: 'Thứ 3',
-                                        },
-                                        {
-                                            label: 'Thứ 4',
-                                            value: 'Thứ 4',
-                                        },
-                                        {
-                                            label: 'Thứ 5',
-                                            value: 'Thứ 5',
-                                        },
-                                        {
-                                            label: 'Thứ 6',
-                                            value: 'Thứ 6',
-                                        },
-                                        {
-                                            label: 'Thứ 7',
-                                            value: 'Thứ 7',
-                                        },
-                                    ]}
-                                />
+                                <Input placeholder="Địa chỉ" rows={4} />
                             </Form.Item>
                         </div>
                     </div>
-
-                    <Form.Item
-                        name={"address"}
-                        label="Địa chỉ"
-                    >
-                        <TextArea placeholder="Địa chỉ" rows={4} />
-                    </Form.Item>
                     <Form.Item
                         name="status"
                         label="Trạng thái"

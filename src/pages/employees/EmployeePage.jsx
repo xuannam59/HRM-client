@@ -122,17 +122,13 @@ const EmployeePage = () => {
             dataIndex: "phoneNumber"
         },
         {
-            title: "Chuyên môn",
-            dataIndex: "specialize",
+            title: "Vị trí",
+            dataIndex: "position",
             align: "center"
         },
         {
             title: "Vai trò",
             dataIndex: "role"
-        },
-        {
-            title: "Lịch dạy",
-            dataIndex: "schedule"
         },
         {
             title: "Địa chỉ",

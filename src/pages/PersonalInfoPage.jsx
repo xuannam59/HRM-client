@@ -56,10 +56,6 @@ const PersonalInfoPage = () => {
         {
             label: 'Địa chỉ',
             children: dataEmployee.address,
-        },
-        {
-            label: "Lịch dạy",
-            children: dataEmployee.schedule
         }
     ];
 

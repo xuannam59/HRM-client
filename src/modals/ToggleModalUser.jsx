@@ -30,6 +30,7 @@ const UserModal = (props) => {
     useEffect(() => {
         getAllEmployees();
     }, []);
+
     const handleCancel = () => {
         form.resetFields();
         setSelectedFile(undefined);
