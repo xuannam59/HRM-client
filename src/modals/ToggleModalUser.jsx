@@ -41,7 +41,7 @@ const UserModal = (props) => {
     }
 
     const getAllEmployees = async () => {
-        const apiEmployees = `/employees/all`;
+        const apiEmployees = `/auth/not-account`;
         try {
             const resEmployees = await handleApi(apiEmployees);
             if (resEmployees.data) {
@@ -76,7 +76,7 @@ const UserModal = (props) => {
         const api = `/auth/${userSelected ? `update/${userSelected._id}` : "register"}`;
         console.log(data)
         try {
-            const res = await handleApi(api, data, `${userSelected ? "put" : "post"}`);
+            const res = await handleApi(api, data, `${userSelected ? "patch" : "post"}`);
             if (res.data) {
                 handleCancel();
                 loadData();
@@ -104,7 +104,7 @@ const UserModal = (props) => {
         <>
             <Modal
                 closable={!isLoading}
-                title={userSelected ? "Update Employee" : "Create Employee"}
+                title={userSelected ? "Cập nhập tài khoản" : "Tạo tài khoản"}
                 open={visible}
                 onCancel={handleCancel}
                 onOk={() => form.submit()}
@@ -152,37 +152,6 @@ const UserModal = (props) => {
                         />
                     </Form.Item>
                     <div className="row">
-                        <div className="col-6">
-                            <Form.Item
-                                name={"password"}
-                                label="Mật khẩu"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "Vui lòng nhập Password!"
-                                    }
-                                ]}
-                            >
-                                <Input.Password placeholder="password" />
-                            </Form.Item>
-                        </div>
-                        <div className="col-6">
-                            <Form.Item
-                                name={"confirmPassword"}
-                                label="Xác thực mật khẩu"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "Vui lòng nhập confirmPassword!"
-                                    }
-                                ]}
-                            >
-                                <Input.Password placeholder="confirmPassword" />
-                            </Form.Item>
-                        </div>
-                    </div>
-
-                    <div className="row">
                         <div className="col-9">
                             <Form.Item
                                 name={"email"}
@@ -198,7 +167,7 @@ const UserModal = (props) => {
                                     }
                                 ]}
                             >
-                                <Input placeholder="Email" />
+                                <Input placeholder="Email" disabled={userSelected ? true : false} />
                             </Form.Item>
                         </div>
                         <div className="col-3">
@@ -228,6 +197,37 @@ const UserModal = (props) => {
                                             label: 'user',
                                         },
                                     ]} />
+                            </Form.Item>
+                        </div>
+                    </div>
+
+                    <div className="row">
+                        <div className="col-6">
+                            <Form.Item
+                                name={"password"}
+                                label="Mật khẩu"
+                                rules={!userSelected ? [
+                                    {
+                                        required: true,
+                                        message: "Vui lòng nhập Password!"
+                                    }
+                                ] : []}
+                            >
+                                <Input.Password placeholder="password" />
+                            </Form.Item>
+                        </div>
+                        <div className="col-6">
+                            <Form.Item
+                                name={"confirmPassword"}
+                                label="Xác thực mật khẩu"
+                                rules={!userSelected ? [
+                                    {
+                                        required: true,
+                                        message: "Vui lòng nhập Password!"
+                                    }
+                                ] : []}
+                            >
+                                <Input.Password placeholder="confirmPassword" />
                             </Form.Item>
                         </div>
                     </div>

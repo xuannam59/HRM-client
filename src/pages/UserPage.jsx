@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import { FiDownload } from "react-icons/fi";
 import { exportExcel } from "../utils/exportExcel.util";
 import moment from "moment";
-import UserModal from "../modals/UserModal";
+import UserModal from "../modals/ToggleModalUser";
 
 const { Title } = Typography;
 
@@ -64,7 +64,7 @@ const UserPage = () => {
     }
 
     const handleDeleteEmployee = async (id) => {
-        const api = `/user/delete/${id}`;
+        const api = `/auth/delete/${id}`;
         try {
             const res = await handelAPI(api, "", "delete");
             if (res.data) {

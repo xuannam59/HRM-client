@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Button, Space, Table, Tooltip, Typography } from "antd";
-import { MdOutlineEdit } from "react-icons/md";
+import { Button, notification, Popconfirm, Space, Table, Tooltip, Typography } from "antd";
+import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
 import { IoIosAdd } from "react-icons/io";
 import moment from "moment";
 import Link from "antd/es/typography/Link";
@@ -93,12 +93,40 @@ const CollaboratePage = () => {
                                 }}
                             />
                         </Tooltip>
+
+                        <Popconfirm
+                            placement="right"
+                            title="Xoá công tác"
+                            description="Bạn chắc chắn xoá công tác này không"
+                            onConfirm={() => handleDeleteApplication(record._id)}
+                            onCancel={""}
+                            okText="Yes"
+                            cancelText="No"
+                        >
+
+                            <Button
+                                type="text"
+                                icon={<MdOutlineDeleteForever size={20} />}
+                                danger
+                            />
+                        </Popconfirm>
                     </Space>
                 </>);
             }
         }
 
     ];
+
+    const handleDeleteApplication = async (id) => {
+        setIsLoading(true);
+        const data = dataSource.filter(item => item._id !== id);
+        setDataSource(data);
+        notification.success({
+            message: "Update success",
+            description: "Xoá công tác thánh công"
+        });
+        setIsLoading(false);
+    }
 
 
     return (

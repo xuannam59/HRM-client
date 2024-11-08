@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, notification, Popconfirm, Space, Table, Tag, Tooltip, Typography } from "antd";
-import { MdOutlineEdit } from "react-icons/md";
+import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
 import moment from "moment";
 import Link from "antd/es/typography/Link";
 import ToggleModalFostering from "../modals/ToggleModalFostering";
@@ -107,12 +107,39 @@ const FosteringPage = () => {
                                 }}
                             />
                         </Tooltip>
+
+                        <Popconfirm
+                            placement="right"
+                            title="Xoá bồi dưỡng"
+                            description="Bạn chắc chắn xoá bồi dưỡng này"
+                            onConfirm={() => handleDeleteApplication(record._id)}
+                            onCancel={""}
+                            okText="Yes"
+                            cancelText="No"
+                        >
+
+                            <Button
+                                type="text"
+                                icon={<MdOutlineDeleteForever size={20} />}
+                                danger
+                            />
+                        </Popconfirm>
                     </Space>
                 </>);
             }
         }
-
     ];
+
+    const handleDeleteApplication = async (id) => {
+        setIsLoading(true);
+        const data = dataSource.filter(item => item._id !== id);
+        setDataSource(data);
+        notification.success({
+            message: "Update success",
+            description: "Xoá Lịch thánh công"
+        });
+        setIsLoading(false);
+    }
 
 
     return (

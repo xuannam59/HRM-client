@@ -117,12 +117,40 @@ const SchedulePage = () => {
                                 }}
                             />
                         </Tooltip>
+
+                        <Popconfirm
+                            placement="right"
+                            title="Xoá Lịch"
+                            description="Bạn chắc chắn xoá lịch này không"
+                            onConfirm={() => handleDeleteApplication(record._id)}
+                            onCancel={""}
+                            okText="Yes"
+                            cancelText="No"
+                        >
+
+                            <Button
+                                type="text"
+                                icon={<MdOutlineDeleteForever size={20} />}
+                                danger
+                            />
+                        </Popconfirm>
                     </Space>
                 </>);
             }
         }
 
     ];
+
+    const handleDeleteApplication = async (id) => {
+        setIsLoading(true);
+        const data = dataSource.filter(item => item._id !== id);
+        setDataSource(data);
+        notification.success({
+            message: "Update success",
+            description: "Xoá Lịch thánh công"
+        });
+        setIsLoading(false);
+    }
 
 
     return (

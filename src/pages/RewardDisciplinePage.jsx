@@ -127,6 +127,23 @@ const RewardDisciplinePage = () => {
                                 }}
                             />
                         </Tooltip>
+
+                        <Popconfirm
+                            placement="right"
+                            title="Xoá thưởng & kỷ luật"
+                            description="Bạn chắc chắn xoá thưởng & kỷ luật này không"
+                            onConfirm={() => handleDeleteApplication(record._id)}
+                            onCancel={""}
+                            okText="Yes"
+                            cancelText="No"
+                        >
+
+                            <Button
+                                type="text"
+                                icon={<MdOutlineDeleteForever size={20} />}
+                                danger
+                            />
+                        </Popconfirm>
                     </Space>
                 </>);
             }
@@ -134,6 +151,16 @@ const RewardDisciplinePage = () => {
 
     ];
 
+    const handleDeleteApplication = async (id) => {
+        setIsLoading(true);
+        const data = dataSource.filter(item => item._id !== id);
+        setDataSource(data);
+        notification.success({
+            message: "Update success",
+            description: "Xoá thưởng & kỷ luật thánh công"
+        });
+        setIsLoading(false);
+    }
 
     return (
         <>

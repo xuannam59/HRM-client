@@ -17,31 +17,36 @@ const HomePage = () => {
                     <Title level={4}>Tổng quan</Title>
                 </div>
             </div >
+            <div className="row m-3">
+                <div className="col text-right">
+                    <Title level={4}>Cập nhập</Title>
+                </div>
+            </div >
             <Row gutter={[20, 20]}>
                 <Col span={24} md={8}>
                     <Card title="Đơn tuyển dụng" bordered={false} >
                         <Statistic
                             title="số người nộp"
-                            value={200}
+                            value={20}
                             formatter={formatter}
                         />
 
                     </Card>
                 </Col>
                 <Col span={24} md={8}>
-                    <Card title="Card title" bordered={false} >
+                    <Card title="Nhân viên" bordered={false} >
                         <Statistic
-                            title="Active Users"
-                            value={250}
+                            title="Số nhân viên"
+                            value={20}
                             formatter={formatter}
                         />
                     </Card>
                 </Col>
                 <Col span={24} md={8}>
-                    <Card title="Card title" bordered={false} >
+                    <Card title="Người dùng" bordered={false} >
                         <Statistic
-                            title="Active Users"
-                            value={200}
+                            title="Số người dùng"
+                            value={20}
                             formatter={formatter}
                         />
                     </Card>

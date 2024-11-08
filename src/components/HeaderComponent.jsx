@@ -1,4 +1,4 @@
-import { Avatar, Button, Dropdown, Input, Popover, Space } from "antd";
+import { Avatar, Button, Dropdown, Input, Popover, Space, Tag } from "antd";
 import { CiLogout, CiSearch } from "react-icons/ci";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,11 +14,6 @@ const HeaderComponent = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const items = [
-        {
-            key: 'personalInfo',
-            label: <Link to="/personal-info">Thông tin cá nhân</Link>,
-            icon: <PiUserCircle size={20} />,
-        },
         {
             key: 'resetPassword',
             label: <Link to="/reset-password">Đổi mật khẩu</Link>,
@@ -50,6 +45,7 @@ const HeaderComponent = () => {
             </div>
             <div className="col text-end me-3">
                 <Space>
+                    <Tag color="purple">{user.role.toUpperCase()}</Tag>
                     <Button type="text" icon={<IoMdNotificationsOutline size={24} color="#5d6679" />} />
                     <Dropdown menu={{ items }} trigger={"click"}>
                         <Avatar src={user.avatar} size={40} style={{ cursor: "pointer" }} />

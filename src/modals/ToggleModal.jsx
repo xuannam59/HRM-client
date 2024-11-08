@@ -33,65 +33,11 @@ const ToggleModal = (props) => {
         }
     }, [employeeSelected]);
 
-    useEffect(() => {
-        getDataList();
-    }, []);
     const handleCancel = () => {
         form.resetFields();
         setSelectedFile(undefined);
         setPreview(undefined);
         onClose();
-    }
-
-    const getDataList = async () => {
-        const apiPositions = `/positions/all`;
-        const apiLevels = `/levels/all`;
-        const apiSpecialize = `/specializes/all`;
-        const apiDepartment = `/departments/all`;
-        try {
-            const resPositions = await handleApi(apiPositions);
-            if (resPositions.data) {
-                const data = resPositions.data.map(item => {
-                    return {
-                        value: item._id,
-                        label: item.title
-                    }
-                });
-                setPositions(data);
-            }
-            const resLevels = await handleApi(apiLevels);
-            if (resLevels.data) {
-                const data = resLevels.data.map(item => {
-                    return {
-                        value: item._id,
-                        label: item.title
-                    }
-                });
-                setLevels(data);
-            }
-            const resSpecialize = await handleApi(apiSpecialize);
-            if (resSpecialize.data) {
-                const data = resSpecialize.data.map(item => {
-                    return {
-                        value: item._id,
-                        label: item.title
-                    }
-                });
-                setSpecialize(data);
-            }
-            const resDepartment = await handleApi(apiDepartment);
-            if (resDepartment.data) {
-                const data = resDepartment.data.map(item => {
-                    return {
-                        value: item._id,
-                        label: item.title
-                    }
-                });
-                setDepartment(data);
-            }
-        } catch (error) {
-            console.log(error)
-        }
     }
     const onSelectFile = (event) => {
         if (!event.target.files || event.target.files.length === 0) {
@@ -104,10 +50,9 @@ const ToggleModal = (props) => {
         setSelectedFile(fileUpload);
         setPreview(URL.createObjectURL(fileUpload));
     }
-
     const onFinish = async (values) => {
         setIsLoading(true);
-        if (typeof values.schedul === "object") {
+        if (typeof values.schedule === "object") {
             values.schedule = values.schedule.join(",");
         }
         const data = values;
@@ -251,44 +196,57 @@ const ToggleModal = (props) => {
                             </Form.Item>
                         </div>
                     </div>
-                    <Form.Item
-                        name={"schedule"}
-                        label="Lịch dạy"
-                    >
-                        <Select
-                            mode="multiple"
-                            style={{
-                                width: '100%',
-                            }}
-                            placeholder="Lịch dạy"
-                            options={[
-                                {
-                                    label: 'Thứ 2',
-                                    value: 'Thứ 2',
-                                },
-                                {
-                                    label: 'Thứ 3',
-                                    value: 'Thứ 3',
-                                },
-                                {
-                                    label: 'Thứ 4',
-                                    value: 'Thứ 4',
-                                },
-                                {
-                                    label: 'Thứ 5',
-                                    value: 'Thứ 5',
-                                },
-                                {
-                                    label: 'Thứ 6',
-                                    value: 'Thứ 6',
-                                },
-                                {
-                                    label: 'Thứ 7',
-                                    value: 'Thứ 7',
-                                },
-                            ]}
-                        />
-                    </Form.Item>
+                    <div className="row">
+                        <div className="col-6">
+                            <Form.Item
+                                name={"specialize"}
+                                label="Chuyên môn"
+                            >
+                                <Input placeholder="Chuyên môn" />
+                            </Form.Item>
+                        </div>
+                        <div className="col-6">
+                            <Form.Item
+                                name={"schedule"}
+                                label="Lịch dạy"
+                            >
+                                <Select
+                                    mode="multiple"
+                                    style={{
+                                        width: '100%',
+                                    }}
+                                    placeholder="Lịch dạy"
+                                    options={[
+                                        {
+                                            label: 'Thứ 2',
+                                            value: 'Thứ 2',
+                                        },
+                                        {
+                                            label: 'Thứ 3',
+                                            value: 'Thứ 3',
+                                        },
+                                        {
+                                            label: 'Thứ 4',
+                                            value: 'Thứ 4',
+                                        },
+                                        {
+                                            label: 'Thứ 5',
+                                            value: 'Thứ 5',
+                                        },
+                                        {
+                                            label: 'Thứ 6',
+                                            value: 'Thứ 6',
+                                        },
+                                        {
+                                            label: 'Thứ 7',
+                                            value: 'Thứ 7',
+                                        },
+                                    ]}
+                                />
+                            </Form.Item>
+                        </div>
+                    </div>
+
                     <Form.Item
                         name={"address"}
                         label="Địa chỉ"

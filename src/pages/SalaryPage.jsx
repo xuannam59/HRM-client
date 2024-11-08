@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, notification, Popconfirm, Space, Table, Tag, Tooltip, Typography } from "antd";
-import { MdOutlineEdit } from "react-icons/md";
+import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
 import moment from "moment";
 import Link from "antd/es/typography/Link";
 import { IoIosAdd } from "react-icons/io";
@@ -25,7 +25,7 @@ const SalaryPage = () => {
             date: "10/1/2024"
         },
         {
-            _id: "nSMưGdssdeobUMm6671v1Zjv",
+            _id: "nSM4gtfssdeobUMm6671v1Zjv",
             fullName: "Lê Văn A",
             position: "Trưởng khoa",
             wage: 500000, // lương theo ngày
@@ -146,12 +146,39 @@ const SalaryPage = () => {
                                 }}
                             />
                         </Tooltip>
+
+                        <Popconfirm
+                            placement="right"
+                            title="Xoá lương"
+                            description="Bạn chắc chắn xoá lương này không"
+                            onConfirm={() => handleDeleteApplication(record._id)}
+                            onCancel={""}
+                            okText="Yes"
+                            cancelText="No"
+                        >
+
+                            <Button
+                                type="text"
+                                icon={<MdOutlineDeleteForever size={20} />}
+                                danger
+                            />
+                        </Popconfirm>
                     </Space>
                 </>);
             }
         },
     ];
 
+    const handleDeleteApplication = async (id) => {
+        setIsLoading(true);
+        const data = dataSource.filter(item => item._id !== id);
+        setDataSource(data);
+        notification.success({
+            message: "Update success",
+            description: "Xoá lương thánh công"
+        });
+        setIsLoading(false);
+    }
 
     return (
         <>

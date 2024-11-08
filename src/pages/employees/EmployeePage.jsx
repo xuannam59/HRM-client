@@ -118,12 +118,13 @@ const EmployeePage = () => {
             dataIndex: "gender"
         },
         {
-            title: "Địa chỉ",
-            dataIndex: "address"
-        },
-        {
             title: "Số điện thoại",
             dataIndex: "phoneNumber"
+        },
+        {
+            title: "Chuyên môn",
+            dataIndex: "specialize",
+            align: "center"
         },
         {
             title: "Vai trò",
@@ -132,6 +133,10 @@ const EmployeePage = () => {
         {
             title: "Lịch dạy",
             dataIndex: "schedule"
+        },
+        {
+            title: "Địa chỉ",
+            dataIndex: "address"
         },
         {
             title: "Trạng thái",
