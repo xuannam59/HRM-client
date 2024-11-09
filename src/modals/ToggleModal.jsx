@@ -85,7 +85,6 @@ const ToggleModal = (props) => {
         } finally {
             setIsLoading(false);
         }
-        setIsLoading(false);
     }
     return (
         <>
@@ -208,7 +207,10 @@ const ToggleModal = (props) => {
                                     },
                                 ]}
                             >
-                                <Input placeholder="Vị trí" />
+                                <Select options={[
+                                    { value: 'Giáo viên', label: 'Giáo viên' },
+                                    { value: 'Kế Toán', label: 'Kế Toán' },
+                                ]} placeholder="Vị trí" />
                             </Form.Item>
                         </div>
                         <div className="col-6">
@@ -216,7 +218,7 @@ const ToggleModal = (props) => {
                                 name={"address"}
                                 label="Địa chỉ"
                             >
-                                <Input placeholder="Địa chỉ" rows={4} />
+                                <Input placeholder="Địa chỉ" />
                             </Form.Item>
                         </div>
                     </div>

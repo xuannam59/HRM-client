@@ -48,8 +48,6 @@ const ToggleModalApplication = (props) => {
         } finally {
             setIsLoading(false);
         }
-        handleCancel()
-        setIsLoading(false);
     }
 
     const handleCancel = () => {

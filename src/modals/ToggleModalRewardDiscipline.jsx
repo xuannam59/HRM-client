@@ -51,7 +51,6 @@ const ToggleModalRewardDiscipline = (props) => {
             message: "Create success",
             description: "Thêm mới phần thưởng thánh công"
         })
-        handleCancel();
         setIsLoading(false);
     }
 

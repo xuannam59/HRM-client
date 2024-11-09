@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, notification, Popconfirm, Space, Table, Tag, Tooltip, Typography } from "antd";
 import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
-import moment from "moment";
 import Link from "antd/es/typography/Link";
 import ToggleModalFostering from "../modals/ToggleModalFostering";
 import { IoIosAdd } from "react-icons/io";
+import handelAPI from "../api/handleAPI";
+import dayjs from "dayjs";
+
 
 const { Title } = Typography;
 
@@ -12,42 +14,33 @@ const FosteringPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [visible, setVisible] = useState(false);
     const [dataSelected, setDataSelected] = useState(undefined);
-    const [dataSource, setDataSource] = useState([{
-        _id: "nSMưGdssdeobUMm6671v1Zjv",
-        teacher: "Lê Văn E",
-        subject: "Toán",
-        schedule: "Thứ 2",
-        status: "active"
-    },
-    {
-        _id: "0gMl9WgIgrwsf5G3scxoj0a7R",
-        teacher: "Lê Văn B",
-        subject: "Văn",
-        schedule: "Thứ 3",
-        status: "active"
-    },
-    {
-        _id: "nSMưGnDsdeobUMm6671v1Zjv",
-        teacher: "Lê Văn A",
-        subject: "Giáo dục",
-        schedule: "Thứ 3",
-        status: "active"
-    },
-    {
-        _id: "nSMưGnDsưdabUMm6671v1Zjv",
-        teacher: "Lê Văn C",
-        subject: "Anh",
-        schedule: "Thứ 4",
-        status: "inactive"
-    },
-    {
-        _id: "nSMưGnDsdeobUMm6671ưeZjv",
-        teacher: "Thứ 4",
-        subject: "Lịch sử",
-        schedule: "Thứ 6",
-        status: "active"
-    }]);
+    const [current, setCurrent] = useState(1);
+    const [pageSize, setPageSize] = useState(5);
+    const [total, setTotal] = useState(0);
+    const [dataSource, setDataSource] = useState([]);
 
+    useEffect(() => {
+        loadData();
+    }, [current, pageSize]);
+
+    const loadData = async () => {
+        setIsLoading(true);
+        const api = `/fostering?current=${current}&&pageSize=${pageSize}`;
+        try {
+            const res = await handelAPI(api);
+
+            if (res.data) {
+                setDataSource(res.data);
+                setCurrent(res.meta.current);
+                setPageSize(res.meta.pageSize);
+                setTotal(res.meta.total);
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
     const columns = [
         {
@@ -68,15 +61,37 @@ const FosteringPage = () => {
         },
         {
             title: 'Giáo viên',
-            dataIndex: "teacher",
+            render: (record) => {
+                return record.employeeId.fullName
+            }
         },
         {
             title: 'Môn bồi dưỡng',
             dataIndex: "subject",
+            align: "center"
         },
         {
             title: 'Lịch bồi dưỡng',
             dataIndex: "schedule",
+            align: "center"
+        },
+        {
+            title: 'Giờ bắt đầu',
+            render: (text, record) => {
+                return (<Tag color="lime">{dayjs(record.startTime).format("HH:mm:ss")}</Tag>)
+            },
+            align: "center"
+        },
+        {
+            title: 'Giờ kết thúc',
+            render: (text, record) => {
+                return (<Tag color="volcano">{dayjs(record.endTime).format("HH:mm:ss")}</Tag>)
+            },
+            align: "center"
+        },
+        {
+            title: 'Phòng học',
+            dataIndex: "room"
         },
         {
             title: 'trạng thái',
@@ -112,7 +127,7 @@ const FosteringPage = () => {
                             placement="right"
                             title="Xoá bồi dưỡng"
                             description="Bạn chắc chắn xoá bồi dưỡng này"
-                            onConfirm={() => handleDeleteApplication(record._id)}
+                            onConfirm={() => handleDeleteFostering(record._id)}
                             onCancel={""}
                             okText="Yes"
                             cancelText="No"
@@ -130,14 +145,35 @@ const FosteringPage = () => {
         }
     ];
 
-    const handleDeleteApplication = async (id) => {
+    const onChangeTable = (pagination, filters, sorter, extra) => {
+        if (pagination.current && pagination.current !== current) {
+            setCurrent(pagination.current);
+        }
+        if (pagination.pageSize && pagination.pageSize !== pageSize) {
+            setPageSize(pagination.pageSize);
+        }
+    }
+
+    const handleDeleteFostering = async (id) => {
         setIsLoading(true);
-        const data = dataSource.filter(item => item._id !== id);
-        setDataSource(data);
-        notification.success({
-            message: "Update success",
-            description: "Xoá Lịch thánh công"
-        });
+        const api = `/fostering/delete/${id}`;
+        try {
+            const res = await handelAPI(api, "", "delete");
+            if (res.data) {
+                loadData();
+                notification.success({
+                    message: res.message,
+                    description: "Xoá Lịch bồi dưỡng thành công"
+                })
+            } else {
+                notification.error({
+                    message: "Delete Error",
+                    description: res.message,
+                })
+            }
+        } catch (error) {
+            console.log(error);
+        }
         setIsLoading(false);
     }
 
@@ -163,6 +199,9 @@ const FosteringPage = () => {
                 columns={columns}
                 dataSource={dataSource}
                 pagination={{
+                    current: current,
+                    pageSize: pageSize,
+                    total: total,
                     position: ["bottomCenter"],
                     showSizeChanger: true,
                     pageSizeOptions: [5, 10, 20, 50],
@@ -171,12 +210,14 @@ const FosteringPage = () => {
                 scroll={{
                     x: 'max-content'
                 }}
+                onChange={onChangeTable}
                 rowKey="_id"
             />
 
             <ToggleModalFostering
                 visible={visible}
                 dataSelected={dataSelected}
+                loadData={loadData}
                 onClose={() => {
                     setVisible(false);
                     setDataSelected(undefined);

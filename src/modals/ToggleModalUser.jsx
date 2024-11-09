@@ -94,7 +94,6 @@ const UserModal = (props) => {
         } finally {
             setIsLoading(false);
         }
-        setIsLoading(false);
     }
     return (
         <>

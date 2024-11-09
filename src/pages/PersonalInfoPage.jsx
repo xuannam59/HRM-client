@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import handelAPI from "../api/handleAPI";
-import { Avatar, Descriptions, notification, Table, Tag, Typography } from "antd";
+import { Avatar, Descriptions, notification, Space, Table, Tag, Typography } from "antd";
 import { useSelector } from "react-redux";
 import { authSelector } from "../redux/reducers/authReducer";
 import moment from "moment";
+import dayjs from "dayjs";
 
 const { Title } = Typography;
 
@@ -11,22 +12,33 @@ const PersonalInfoPage = () => {
     const user = useSelector(authSelector);
     const [isLoading, setIsLoading] = useState(false);
     const [dataEmployee, setDataEmployee] = useState({});
+    const [dataSchedule, setDataSchedule] = useState([]);
 
     useEffect(() => {
-        getEmployee();
+        getData();
     }, []);
 
-    const getEmployee = async () => {
+    const getData = async () => {
         setIsLoading(true);
-        const api = `/employees/detail/${user.employeeId}`;
+        const apiEmployee = `/employees/detail/${user.employeeId}`;
+        const apiSchedule = `/schedules/${user.employeeId}`;
         try {
-            const res = await handelAPI(api);
-            if (res.data) {
-                setDataEmployee(res.data);
+            const resEmployee = await handelAPI(apiEmployee);
+            if (resEmployee.data) {
+                setDataEmployee(resEmployee.data);
             } else {
                 notification.error({
                     message: "Error",
-                    description: res.message
+                    description: resEmployee.message
+                })
+            }
+            const resSchedule = await handelAPI(apiSchedule);
+            if (resSchedule.data) {
+                setDataSchedule(resSchedule.data);
+            } else {
+                notification.error({
+                    message: "Error",
+                    description: resSchedule.message
                 })
             }
         } catch (error) {
@@ -59,7 +71,7 @@ const PersonalInfoPage = () => {
         }
     ];
 
-    const columns = [
+    const columnsSalary = [
         {
             title: 'STT',
             dataIndex: "index",
@@ -144,6 +156,52 @@ const PersonalInfoPage = () => {
         },
     ];
 
+    const columnsSchedule = [
+        {
+            title: 'STT',
+            dataIndex: "index",
+            render: (text, record, index) => {
+                return index + 1;
+            }
+        },
+        {
+            title: 'Giáo viên',
+            render: (record) => {
+                return record.employeeId.fullName
+            }
+        },
+        {
+            title: 'Thứ',
+            dataIndex: "day",
+        },
+        {
+            title: 'Môn học',
+            dataIndex: "subject",
+        },
+        {
+            title: 'Giờ bắt đầu',
+            render: (text, record) => {
+                return (<Tag color="lime">{dayjs(record.startTime).format("HH:mm:ss")}</Tag>)
+            },
+            align: "center"
+        },
+        {
+            title: 'Giờ kết thúc',
+            render: (text, record) => {
+                return (<Tag color="volcano">{dayjs(record.endTime).format("HH:mm:ss")}</Tag>)
+            },
+            align: "center"
+        },
+        {
+            title: 'Phòng học',
+            dataIndex: "room"
+        },
+        {
+            title: 'Mô tả',
+            dataIndex: "descriptions"
+        },
+    ];
+
     const dataSalary = [{
         _id: "nSMưGdssdeobUMm6671v1Zjv",
         fullName: "Lê Văn A",
@@ -156,7 +214,7 @@ const PersonalInfoPage = () => {
         date: "10/1/2024"
     }]
 
-    console.log(items);
+
 
     return (<>
         <div className="row m-3">
@@ -170,15 +228,32 @@ const PersonalInfoPage = () => {
         </div>
         <div className="container text-center mt-5">
             <div className="row m-3">
+                <Title level={5}>Lịch dạy</Title>
+            </div>
+            <Table
+                loading={isLoading}
+                columns={columnsSchedule}
+                dataSource={dataSchedule}
+                pagination={{
+                    position: ["bottomCenter"],
+                    pageSize: 5,
+                }}
+                rowKey="_id"
+                align="center"
+            />
+        </div>
+
+        <div className="container text-center mt-5">
+            <div className="row m-3">
                 <Title level={5}>Bảng lương</Title>
             </div>
             <Table
                 loading={isLoading}
-                columns={columns}
+                columns={columnsSalary}
                 dataSource={dataSalary}
                 pagination={{
+                    pageSize: 5,
                     position: ["bottomCenter"],
-                    showSizeChanger: true,
                 }}
                 scroll={{
                     x: 'max-content'

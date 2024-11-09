@@ -78,7 +78,6 @@ const ToggleModalCollaborate = (props) => {
             console.log(error);
         } finally {
             setIsLoading(false);
-            handleCancel();
         }
     }
 

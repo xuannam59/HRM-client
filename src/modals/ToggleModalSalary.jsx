@@ -192,7 +192,7 @@ const ToggleModalSalary = (props) => {
                 </div>
                 <Form.Item
                     name={"status"}
-                    label={"Tạm ứng"}
+                    label={"Trạng thái"}
                 >
 
                     <Radio.Group>

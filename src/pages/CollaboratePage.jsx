@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Button, notification, Popconfirm, Space, Table, Tooltip, Typography } from "antd";
 import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
 import { IoIosAdd } from "react-icons/io";
-import moment from "moment";
 import Link from "antd/es/typography/Link";
 import ToggleModalCollaborate from "../modals/ToggleModalCollaborate";
 import handelAPI from "../api/handleAPI";

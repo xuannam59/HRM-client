@@ -1,50 +1,86 @@
-import { DatePicker, Form, Input, Modal, notification, Select } from "antd";
+import { DatePicker, Form, Input, Modal, notification, Radio, Select, TimePicker } from "antd";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import handleApi from "../api/handleAPI";
 import { authSelector } from "../redux/reducers/authReducer";
 import { generateString } from "../utils/generateString.util";
+import dayjs from "dayjs";
 
 const ToggleModalFostering = (props) => {
     const {
         visible, onClose,
-        setDataSource, dataSource,
+        setDataSource, dataSource, loadData,
         dataSelected
     } = props
 
     const user = useSelector(authSelector);
     const [isLoading, setIsLoading] = useState(false);
+    const [teachers, setTeachers] = useState(undefined);
+    const [form] = Form.useForm();
 
     useEffect(() => {
         if (dataSelected) {
-            form.setFieldsValue(dataSelected);
+            const data = {
+                ...dataSelected,
+                employeeId: dataSelected.employeeId._id,
+                startTime: dayjs(dataSelected.startTime),
+                endTime: dayjs(dataSelected.endTime),
+            }
+            form.setFieldsValue(data);
         }
     }, [dataSelected]);
 
-    const [form] = Form.useForm();
+
+
+    useEffect(() => {
+        getTeachers();
+    }, []);
+
+    const getTeachers = async () => {
+        const apiTeachers = `/schedules/teachers`;
+        try {
+            const resTeachers = await handleApi(apiTeachers);
+            if (resTeachers.data) {
+                const data = resTeachers.data.map(item => {
+                    return {
+                        value: item._id,
+                        label: item.fullName
+                    }
+                });
+                setTeachers(data);
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     const onFinish = async (values) => {
         setIsLoading(true);
-        // Push vào phần tử
-        const data = dataSource;
-        if (!dataSelected) {
-            data.push(values)
-            setDataSource(data);
-        } else {
-            const index = data.findIndex(item => item._id === dataSelected._id);
-            data[index] = values;
-
-            setDataSource(data);
+        const api = `/fostering/${dataSelected ? `update/${dataSelected._id}` : "create"}`;
+        try {
+            const res = await handleApi(api, values, `${dataSelected ? "patch" : "post"}`);
+            if (res.data) {
+                handleCancel();
+                loadData();
+                notification.success(dataSelected ? {
+                    message: "Updata Susseccfully",
+                    description: "Cập nhập lịch bồi dưỡng thành công"
+                } : {
+                    message: "Create Susseccfully",
+                    description: "Tạo lịch bồi dưỡng thành công"
+                });
+            } else {
+                notification.error({
+                    message: "Error",
+                    description: res.message
+                });
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsLoading(false);
         }
-        notification.success(dataSelected ? {
-            message: "Update success",
-            description: "Cập nhập bồi dưỡng thánh công"
-        } : {
-            message: "Create success",
-            description: "Thêm mới bồi dưỡng thánh công"
-        })
-        handleCancel();
-        setIsLoading(false);
     }
 
     const handleCancel = () => {
@@ -78,8 +114,8 @@ const ToggleModalFostering = (props) => {
                 }}
             >
                 <Form.Item
-                    name={"_id"}
-                    label={"Mã bồi dưỡng"}
+                    name={"employeeId"}
+                    label={"Giáo viên"}
                     rules={[
                         {
                             required: true,
@@ -88,25 +124,7 @@ const ToggleModalFostering = (props) => {
                     ]}
                 >
 
-                    <Input disabled={true} />
-                </Form.Item>
-                <Form.Item
-                    name={"teacher"}
-                    label={"Nhân viên"}
-                    rules={[
-                        {
-                            required: true,
-                            message: "Vui không được để trống!"
-                        }
-                    ]}
-                >
-
-                    <Select options={[
-                        { value: 'Lê Văn E', label: 'Lê Văn E' },
-                        { value: 'Nam Lê', label: 'Nam Lê' },
-                        { value: 'Lê Văn B', label: 'Lê Văn B' },
-                        { value: 'Lê Văn A', label: 'Lê Văn A' },
-                    ]} placeholder="Nhân viên" />
+                    <Select options={teachers} placeholder="Giáo viên" />
                 </Form.Item>
                 <Form.Item
                     name={"subject"}
@@ -148,11 +166,88 @@ const ToggleModalFostering = (props) => {
                         { value: 'Thứ 7', label: 'Thứ 7' },
                     ]} placeholder="Lịch bồi dưỡng" />
                 </Form.Item>
+                <div className="row">
+                    <div className="col-4">
+                        <Form.Item
+                            name={"startTime"}
+                            label={"Giờ bắt đầu"}
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Vui không được để trống!"
+                                }
+                            ]}
+                        >
+
+                            <TimePicker
+                                style={{
+                                    width: '100%',
+                                }}
+                                placeholder="Giờ bắt đầu"
+                            />
+                        </Form.Item>
+                    </div>
+                    <div className="col-4">
+                        <Form.Item
+                            name={"endTime"}
+                            label={"Giờ kết thúc"}
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Vui không được để trống!"
+                                }
+                            ]}
+                        >
+
+                            <TimePicker
+                                style={{
+                                    width: '100%',
+                                }}
+                                placeholder="Giờ kết thúc"
+                            />
+                        </Form.Item>
+                    </div>
+
+                    <div className="col-4">
+                        <Form.Item
+                            name={"room"}
+                            label={"Phòng"}
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Vui không được để trống!"
+                                }
+                            ]}
+                        >
+
+                            <Select options={[
+                                { value: '101', label: '101' },
+                                { value: '102', label: '102' },
+                                { value: '103', label: '103' },
+                                { value: '201', label: '201' },
+                                { value: '202', label: '202' },
+                                { value: '203', label: '203' },
+                            ]} placeholder="Phòng" />
+                        </Form.Item>
+                    </div>
+                </div>
+
                 <Form.Item
                     name={"description"}
                     label={"Mô tả"}
                 >
                     <Input.TextArea rows={2} />
+                </Form.Item>
+
+                <Form.Item
+                    name={"status"}
+                    label={"Trạng thái"}
+                >
+
+                    <Radio.Group>
+                        <Radio.Button value="active">Hoạt động</Radio.Button>
+                        <Radio.Button value="inactive" >Ngừng hoạt động</Radio.Button>
+                    </Radio.Group>
                 </Form.Item>
                 <div className="row">
                     <div className="col">

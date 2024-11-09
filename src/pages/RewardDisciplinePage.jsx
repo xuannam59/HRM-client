@@ -51,8 +51,6 @@ const RewardDisciplinePage = () => {
         },
 
     ]);
-
-    console.log(moment(moment.now()).format("DD/MM/YYYY"))
     const columns = [
         {
             title: 'STT',

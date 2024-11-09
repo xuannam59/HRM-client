@@ -80,8 +80,6 @@ const ToggleModalSchedule = (props) => {
         } finally {
             setIsLoading(false);
         }
-        handleCancel();
-        setIsLoading(false);
     }
 
     const handleCancel = () => {
