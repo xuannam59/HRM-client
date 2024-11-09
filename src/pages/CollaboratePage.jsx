@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, notification, Popconfirm, Space, Table, Tooltip, Typography } from "antd";
 import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
 import { IoIosAdd } from "react-icons/io";
 import moment from "moment";
 import Link from "antd/es/typography/Link";
 import ToggleModalCollaborate from "../modals/ToggleModalCollaborate";
+import handelAPI from "../api/handleAPI";
 
 const { Title } = Typography;
 
@@ -12,37 +13,33 @@ const CollaboratePage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [visible, setVisible] = useState(false);
     const [dataSelected, setDataSelected] = useState(undefined);
-    const [dataSource, setDataSource] = useState([{
-        _id: "nSMưGnDsdeobUMm6671v1Zjv",
-        fullName: "Lê Văn A",
-        unitName: "Trường Nguyễn Xuyến",
-        time: moment("2024-09-28T09:51:21.253+00:00").format("LL")
-    },
-    {
-        _id: "TNkQp1WLAc3Cp6yvRLREcJc",
-        fullName: "Trần Quốc Bảo",
-        unitName: "Trường Nguyễn Đăng Đạo",
-        time: moment("2024-09-21T15:55:19.220+00:00").format("LL")
-    },
-    {
-        _id: "TvrmI9Q20pa0CFWoh067Yt8cv",
-        fullName: "Nguyễn Thị Mai",
-        unitName: "Trường Nội Duệ",
-        time: moment("2024-09-21T16:20:58.461+00:00").format("LL")
-    },
-    {
-        _id: "dupJErnAODtLUzK52b9AFjKG",
-        fullName: "Nguyên Lan Phương",
-        unitName: "Trường Ngô Gia Tự",
-        time: moment("2024-10-22T16:20:58.461+00:00").format("LL")
-    },
-    {
-        _id: "jưjMTETc3mmdLkDzVkiYbhCKv",
-        fullName: "Nguyễn Thị Trang",
-        unitName: "Trường Lý Thái Tổ",
-        time: moment("2025-01-11T16:20:58.461+00:00").format("LL")
-    }]);
+    const [current, setCurrent] = useState(1);
+    const [pageSize, setPageSize] = useState(5);
+    const [total, setTotal] = useState(0);
+    const [dataSource, setDataSource] = useState([]);
 
+    useEffect(() => {
+        loadData();
+    }, [current, pageSize]);
+
+    const loadData = async () => {
+        setIsLoading(true);
+        const api = `/collaborates?current=${current}&&pageSize=${pageSize}&&status=${status}`;
+        try {
+            const res = await handelAPI(api);
+
+            if (res.data) {
+                setDataSource(res.data);
+                setCurrent(res.meta.current);
+                setPageSize(res.meta.pageSize);
+                setTotal(res.meta.total);
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
     const columns = [
         {
@@ -62,8 +59,10 @@ const CollaboratePage = () => {
             }
         },
         {
-            title: 'Mã nhân viên',
-            dataIndex: "fullName",
+            title: 'Giáo viên',
+            render: (record) => {
+                return record.employeeId.fullName
+            }
         },
         {
             title: 'Tên đơn vị',
@@ -71,11 +70,11 @@ const CollaboratePage = () => {
         },
         {
             title: 'Thời gian',
-            dataIndex: "time",
+            dataIndex: "date",
         },
         {
             title: 'Mô tả',
-            dataIndex: "descriptions"
+            dataIndex: "description"
         },
         {
             title: "Action",
@@ -98,7 +97,7 @@ const CollaboratePage = () => {
                             placement="right"
                             title="Xoá công tác"
                             description="Bạn chắc chắn xoá công tác này không"
-                            onConfirm={() => handleDeleteApplication(record._id)}
+                            onConfirm={() => handleDeleteCollaborate(record._id)}
                             onCancel={""}
                             okText="Yes"
                             cancelText="No"
@@ -117,14 +116,36 @@ const CollaboratePage = () => {
 
     ];
 
-    const handleDeleteApplication = async (id) => {
+    const onChangeTable = (pagination, filters, sorter, extra) => {
+        if (pagination.current && pagination.current !== current) {
+            setCurrent(pagination.current);
+        }
+        if (pagination.pageSize && pagination.pageSize !== pageSize) {
+            setPageSize(pagination.pageSize);
+        }
+    }
+
+
+    const handleDeleteCollaborate = async (id) => {
         setIsLoading(true);
-        const data = dataSource.filter(item => item._id !== id);
-        setDataSource(data);
-        notification.success({
-            message: "Update success",
-            description: "Xoá công tác thánh công"
-        });
+        const api = `/collaborates/delete/${id}`;
+        try {
+            const res = await handelAPI(api, "", "delete");
+            if (res.data) {
+                loadData();
+                notification.success({
+                    message: res.message,
+                    description: "Xoá Công tác thành công"
+                })
+            } else {
+                notification.error({
+                    message: "Delete Error",
+                    description: res.message,
+                })
+            }
+        } catch (error) {
+            console.log(error);
+        }
         setIsLoading(false);
     }
 
@@ -150,6 +171,9 @@ const CollaboratePage = () => {
                 columns={columns}
                 dataSource={dataSource}
                 pagination={{
+                    current: current,
+                    pageSize: pageSize,
+                    total: total,
                     position: ["bottomCenter"],
                     showSizeChanger: true,
                     pageSizeOptions: [5, 10, 20, 50],
@@ -158,12 +182,14 @@ const CollaboratePage = () => {
                 scroll={{
                     x: 'max-content'
                 }}
+                onChange={onChangeTable}
                 rowKey="_id"
             />
 
             <ToggleModalCollaborate
                 visible={visible}
                 dataSelected={dataSelected}
+                loadData={loadData}
                 onClose={() => {
                     setVisible(false);
                     setDataSelected(undefined);

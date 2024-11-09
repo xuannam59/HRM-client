@@ -2,60 +2,84 @@ import { DatePicker, Form, Input, Modal, notification, Select } from "antd";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import handleApi from "../api/handleAPI";
 import { authSelector } from "../redux/reducers/authReducer";
 import { generateString } from "../utils/generateString.util";
 
 const ToggleModalCollaborate = (props) => {
     const {
         visible, onClose,
-        setDataSource, dataSource,
+        setDataSource, dataSource, loadData,
         dataSelected
     } = props
 
     const user = useSelector(authSelector);
     const [isLoading, setIsLoading] = useState(false);
+    const [teachers, setTeachers] = useState(undefined);
+    const [form] = Form.useForm();
+
 
     useEffect(() => {
         if (dataSelected) {
-            dataSelected.time = moment(dataSelected.time)
-            form.setFieldsValue(dataSelected);
+            const data = {
+                ...dataSelected,
+                employeeId: dataSelected.employeeId._id,
+            }
+            form.setFieldsValue(data);
         }
     }, [dataSelected]);
 
-    const [form] = Form.useForm();
+
+
+    useEffect(() => {
+        getTeachers();
+    }, []);
+
+    const getTeachers = async () => {
+        const apiTeachers = `/schedules/teachers`;
+        try {
+            const resTeachers = await handleApi(apiTeachers);
+            if (resTeachers.data) {
+                const data = resTeachers.data.map(item => {
+                    return {
+                        value: item._id,
+                        label: item.fullName
+                    }
+                });
+                setTeachers(data);
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     const onFinish = async (values) => {
         setIsLoading(true);
-        // Push vào phần tử
-        const data = dataSource;
-        if (!dataSelected) {
-            data.push({
-                _id: values._id,
-                fullName: values.fullName,
-                unitName: values.unitName,
-                time: moment(values.time).format("LL")
-            })
-            setDataSource(data);
-        } else {
-            const index = data.findIndex(item => item._id === dataSelected._id);
-            data[index] = {
-                _id: values._id,
-                fullName: values.fullName,
-                unitName: values.unitName,
-                time: moment(values.time).format("LL")
-            };
-
-            setDataSource(data);
+        const api = `/collaborates/${dataSelected ? `update/${dataSelected._id}` : "create"}`;
+        try {
+            const res = await handleApi(api, values, `${dataSelected ? "patch" : "post"}`);
+            if (res.data) {
+                handleCancel();
+                loadData();
+                notification.success(dataSelected ? {
+                    message: "Updata Susseccfully",
+                    description: "Cập nhập công tác thành công"
+                } : {
+                    message: "Create Susseccfully",
+                    description: "Tạo công tác thành công"
+                });
+            } else {
+                notification.error({
+                    message: "Error",
+                    description: res.message
+                });
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsLoading(false);
+            handleCancel();
         }
-        notification.success(dataSelected ? {
-            message: "Update success",
-            description: "Cập nhập công tác thánh công"
-        } : {
-            message: "Create success",
-            description: "Thêm mới công tác thánh công"
-        })
-        handleCancel();
-        setIsLoading(false);
     }
 
     const handleCancel = () => {
@@ -84,25 +108,9 @@ const ToggleModalCollaborate = (props) => {
                 form={form}
                 onFinish={onFinish}
                 disabled={isLoading}
-                initialValues={{
-                    "_id": !dataSelected && generateString(25)
-                }}
             >
                 <Form.Item
-                    name={"_id"}
-                    label={"Mã Công tác"}
-                    rules={[
-                        {
-                            required: true,
-                            message: "Vui không được để trống!"
-                        }
-                    ]}
-                >
-
-                    <Input disabled={true} />
-                </Form.Item>
-                <Form.Item
-                    name={"fullName"}
+                    name={"employeeId"}
                     label={"Nhân viên"}
                     rules={[
                         {
@@ -111,14 +119,7 @@ const ToggleModalCollaborate = (props) => {
                         }
                     ]}
                 >
-                    <Select options={[
-                        { value: generateString(25), label: 'Lê Văn A' },
-                        { value: generateString(25), label: 'Nguyễn Văn B' },
-                        { value: generateString(25), label: 'Nguyễn Hữu C' },
-                        { value: generateString(25), label: 'Trần Thế D' },
-                        { value: generateString(25), label: 'Quốc Bảo E' },
-                        { value: generateString(25), label: 'Nguyễn Thị F' },
-                    ]} placeholder="Nhân viên" />
+                    <Select options={teachers} placeholder="Nhân viên" />
                 </Form.Item>
                 <Form.Item
                     name={"unitName"}
@@ -133,7 +134,7 @@ const ToggleModalCollaborate = (props) => {
                     <Input placeholder="Tên Đơn vị" />
                 </Form.Item>
                 <Form.Item
-                    name={"time"}
+                    name={"date"}
                     label={"Thời gian "}
                     rules={[
                         {
@@ -143,7 +144,12 @@ const ToggleModalCollaborate = (props) => {
                     ]}
                 >
 
-                    <DatePicker />
+                    <Select options={[
+                        { value: "3 tháng", label: '3 tháng' },
+                        { value: "6 tháng", label: '6 tháng' },
+                        { value: "9 tháng", label: '9 tháng' },
+                        { value: "12 tháng", label: '12 tháng' }
+                    ]} placeholder="Thời gian" />
                 </Form.Item>
                 <Form.Item
                     name={"description"}

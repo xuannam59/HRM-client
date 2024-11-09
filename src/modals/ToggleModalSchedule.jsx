@@ -28,7 +28,6 @@ const ToggleModalSchedule = (props) => {
                 startTime: dayjs(dataSelected.startTime),
                 endTime: dayjs(dataSelected.endTime),
             }
-            console.log(data)
             form.setFieldsValue(data);
         }
     }, [dataSelected]);
