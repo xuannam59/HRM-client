@@ -2,18 +2,21 @@ import { DatePicker, Form, Input, InputNumber, Modal, notification, Radio, Selec
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import handleApi from "../api/handleAPI";
 import { authSelector } from "../redux/reducers/authReducer";
 import { generateString } from "../utils/generateString.util";
+import dayjs from "dayjs";
 
 const ToggleModalSalary = (props) => {
     const {
-        visible, onClose,
-        setDataSource, dataSource,
+        visible, onClose, loadData,
         dataSelected
     } = props
 
     const user = useSelector(authSelector);
+    const [teachers, setTeachers] = useState(undefined);
     const [isLoading, setIsLoading] = useState(false);
+    const [form] = Form.useForm();
 
     useEffect(() => {
         if (dataSelected) {
@@ -21,37 +24,65 @@ const ToggleModalSalary = (props) => {
         }
     }, [dataSelected]);
 
-    const [form] = Form.useForm();
+
+    useEffect(() => {
+        if (dataSelected) {
+            const data = {
+                ...dataSelected,
+                employeeId: dataSelected.employeeId._id,
+            }
+            form.setFieldsValue(data);
+        }
+    }, [dataSelected]);
+
+    useEffect(() => {
+        getTeachers();
+    }, []);
+
+    const getTeachers = async () => {
+        const apiTeachers = `/schedules/teachers`;
+        try {
+            const resTeachers = await handleApi(apiTeachers);
+            if (resTeachers.data) {
+                const data = resTeachers.data.map(item => {
+                    return {
+                        value: item._id,
+                        label: item.fullName
+                    }
+                });
+                setTeachers(data);
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     const onFinish = async (values) => {
         setIsLoading(true);
-        // Push vào phần tử
-        const data = dataSource;
-        if (!dataSelected) {
-            if (!values.allowance)
-                values.allowance = 0
-            if (!values.advance)
-                values.advance = 0
-            data.push({
-                ...values,
-                date: new Date()
-            })
-            setDataSource(data);
-        } else {
-            const index = data.findIndex(item => item._id === dataSelected._id);
-            data[index] = values;
-
-            setDataSource(data);
+        const api = `/salaries/${dataSelected ? `update/${dataSelected._id}` : "create"}`;
+        try {
+            const res = await handleApi(api, values, `${dataSelected ? "patch" : "post"}`);
+            if (res.data) {
+                handleCancel();
+                loadData();
+                notification.success(dataSelected ? {
+                    message: "Updata Susseccfully",
+                    description: "Cập nhập lương thành công"
+                } : {
+                    message: "Create Susseccfully",
+                    description: "Tạo lương thành công"
+                });
+            } else {
+                notification.error({
+                    message: "Error",
+                    description: res.message
+                });
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsLoading(false);
         }
-        notification.success(dataSelected ? {
-            message: "Update success",
-            description: "Cập nhập lương thánh công"
-        } : {
-            message: "Create success",
-            description: "Thêm mới lương thánh công"
-        })
-        handleCancel();
-        setIsLoading(false);
     }
 
     const handleCancel = () => {
@@ -80,13 +111,10 @@ const ToggleModalSalary = (props) => {
                 form={form}
                 onFinish={onFinish}
                 disabled={isLoading}
-                initialValues={{
-                    "_id": !dataSelected && generateString(25)
-                }}
             >
                 <Form.Item
-                    name={"_id"}
-                    label={"Mã lương"}
+                    name={"employeeId"}
+                    label={"Giáo viên"}
                     rules={[
                         {
                             required: true,
@@ -95,11 +123,31 @@ const ToggleModalSalary = (props) => {
                     ]}
                 >
 
-                    <Input disabled={true} />
+                    <Select options={teachers} placeholder="Giáo viên" />
+                </Form.Item>
+
+                <Form.Item
+                    name={"baseSalary"}
+                    label={"Lương cơ sở"}
+                    rules={[
+                        {
+                            required: true,
+                            message: "Vui không được để trống!"
+                        }
+                    ]}
+                >
+
+                    <InputNumber
+                        formatter={(value) => `đ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                        parser={(value) => value?.replace(/đ\s?|(,*)/g, '')}
+                        style={{
+                            width: '100%',
+                        }}
+                    />
                 </Form.Item>
                 <Form.Item
-                    name={"fullName"}
-                    label={"Họ tên"}
+                    name={"salaryCoefficient"}
+                    label={"hệ số lương"}
                     rules={[
                         {
                             required: true,
@@ -107,97 +155,31 @@ const ToggleModalSalary = (props) => {
                         }
                     ]}
                 >
-
-                    <Select options={[
-                        { value: 'Lê Văn E', label: 'Lê Văn E' },
-                        { value: 'Nam Lê', label: 'Nam Lê' },
-                        { value: 'Lê Văn B', label: 'Lê Văn B' },
-                        { value: 'Lê Văn A', label: 'Lê Văn A' },
-                    ]} placeholder="Nhân viên" />
+                    <InputNumber
+                        style={{
+                            width: '100%',
+                        }} />
                 </Form.Item>
+                <Form.Item
+                    name={"allowance"}
+                    label={"Phụ cấp"}
+                >
 
-                <div className="row">
-                    <div className="col-6">
-                        <Form.Item
-                            name={"wage"}
-                            label={"Lương theo tháng"}
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Vui không được để trống!"
-                                }
-                            ]}
-                        >
-
-                            <InputNumber
-                                formatter={(value) => `đ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                parser={(value) => value?.replace(/đ\s?|(,*)/g, '')}
-                                style={{
-                                    width: '100%',
-                                }}
-                            />
-                        </Form.Item>
-                    </div>
-                    <div className="col-6">
-                        <Form.Item
-                            name={"workDay"}
-                            label={"Ngày công"}
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Vui không được để trống!"
-                                }
-                            ]}
-                        >
-                            <InputNumber
-                                formatter={(value) => `đ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                parser={(value) => value?.replace(/đ\s?|(,*)/g, '')}
-                                style={{
-                                    width: '100%',
-                                }} />
-                        </Form.Item>
-                    </div>
-                </div>
-
-                <div className="row">
-                    <div className="col-6">
-                        <Form.Item
-                            name={"allowance"}
-                            label={"Phụ cấp"}
-                        >
-
-                            <InputNumber
-                                formatter={(value) => `đ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                parser={(value) => value?.replace(/đ\s?|(,*)/g, '')}
-                                style={{
-                                    width: '100%',
-                                }} />
-                        </Form.Item>
-                    </div>
-                    <div className="col-6">
-                        <Form.Item
-                            name={"advance"}
-                            label={"Tạm ứng"}
-                        >
-
-                            <InputNumber
-                                formatter={(value) => `đ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                parser={(value) => value?.replace(/đ\s?|(,*)/g, '')}
-                                style={{
-                                    width: '100%',
-                                }}
-                            />
-                        </Form.Item>
-                    </div>
-                </div>
+                    <InputNumber
+                        formatter={(value) => `đ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                        parser={(value) => value?.replace(/đ\s?|(,*)/g, '')}
+                        style={{
+                            width: '100%',
+                        }} />
+                </Form.Item>
                 <Form.Item
                     name={"status"}
                     label={"Trạng thái"}
                 >
 
                     <Radio.Group>
-                        <Radio.Button value="paid">Đã thanh toán</Radio.Button>
-                        <Radio.Button value="" >Chưa thanh toán</Radio.Button>
+                        <Radio.Button value="active">Đã thanh toán</Radio.Button>
+                        <Radio.Button value="inactive" >Chưa thanh toán</Radio.Button>
                     </Radio.Group>
                 </Form.Item>
 

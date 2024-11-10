@@ -13,6 +13,7 @@ const PersonalInfoPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [dataEmployee, setDataEmployee] = useState({});
     const [dataSchedule, setDataSchedule] = useState([]);
+    const [dataSalaries, setDataSalaries] = useState([]);
 
     useEffect(() => {
         getData();
@@ -22,6 +23,7 @@ const PersonalInfoPage = () => {
         setIsLoading(true);
         const apiEmployee = `/employees/detail/${user.employeeId}`;
         const apiSchedule = `/schedules/${user.employeeId}`;
+        const apiSalary = `/salaries/${user.employeeId}`;
         try {
             const resEmployee = await handelAPI(apiEmployee);
             if (resEmployee.data) {
@@ -39,6 +41,15 @@ const PersonalInfoPage = () => {
                 notification.error({
                     message: "Error",
                     description: resSchedule.message
+                })
+            }
+            const resSalaries = await handelAPI(apiSalary);
+            if (resSalaries.data) {
+                setDataSalaries(resSalaries.data);
+            } else {
+                notification.error({
+                    message: "Error",
+                    description: resSalaries.message
                 })
             }
         } catch (error) {
@@ -80,58 +91,50 @@ const PersonalInfoPage = () => {
             }
         },
         {
-            title: 'Họ tên',
-            dataIndex: "fullName",
+            title: 'Giáo viên',
+            render: (record) => {
+                return record.employeeId.fullName
+            }
         },
         {
-            title: "Chức vụ",
-            dataIndex: "position",
+            title: 'Chức vụ',
+            render: (record) => {
+                return record.employeeId.position
+            }
         },
         {
-            title: "Lương theo tháng",
-            dataIndex: "wage",
-            render: (text, record) => {
-                return (
-                    <Tag color="green">
-                        {record.wage.toLocaleString('it-IT', { style: 'currency', currency: 'VND' })}
-                    </Tag>
+            title: "Lương sở sở",
+            dataIndex: "baseSalary",
+            render: (text) => {
+                return (<Tag color="green">
+                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(text)}
+                </Tag>
                 )
             }
         },
         {
-            title: 'Ngày công',
-            dataIndex: "workDay",
+            title: 'Hệ số lương',
+            dataIndex: "salaryCoefficient",
             align: "center"
         },
         {
             title: 'Phụ cấp',
             dataIndex: "allowance",
-            render: (text, record) => {
+            render: (text) => {
                 return (
-                    <Tag color={record.allowance > 0 ? "lime" : ""}>
-                        {record.allowance.toLocaleString('it-IT', { style: 'currency', currency: 'VND' })}
+                    <Tag color={text > 0 ? "green" : ""}>
+                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(text)}
                     </Tag>
                 )
             }
         },
         {
-            title: 'Tạm ứng',
-            dataIndex: "advance",
+            title: 'Tổng lương',
             render: (text, record) => {
-                return (
-                    <Tag color={record.advance > 0 ? "volcano" : ""}>
-                        {record.advance.toLocaleString('it-IT', { style: 'currency', currency: 'VND' })}
-                    </Tag>
-                )
-            }
-        },
-        {
-            title: 'Lương lĩnh',
-            render: (text, record) => {
-                const salary = (record.wage * record.workDay) + record.allowance - record.advance;
+                const salary = (record.baseSalary * record.salaryCoefficient) + record.allowance;
                 return (
                     <Tag color="cyan">
-                        {salary.toLocaleString('it-IT', { style: 'currency', currency: 'VND' })}
+                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(salary)}
                     </Tag>
                 )
             }
@@ -141,8 +144,8 @@ const PersonalInfoPage = () => {
             dataIndex: "status",
             render: (text, record) => {
                 return (
-                    <Tag color={record.status === "paid" ? "#87d068" : "#f50"}>
-                        {record.status === "paid" ? "Đã thanh toán" : "Chưa thanh toán"}
+                    <Tag color={record.status === "active" ? "#87d068" : "#f50"}>
+                        {record.status === "inactive" ? "Đã thanh toán" : "Chưa thanh toán"}
                     </Tag>
                 )
             }
@@ -250,7 +253,7 @@ const PersonalInfoPage = () => {
             <Table
                 loading={isLoading}
                 columns={columnsSalary}
-                dataSource={dataSalary}
+                dataSource={dataSalaries}
                 pagination={{
                     pageSize: 5,
                     position: ["bottomCenter"],

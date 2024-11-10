@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, notification, Popconfirm, Space, Table, Tag, Tooltip, Typography } from "antd";
 import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
 import moment from "moment";
 import Link from "antd/es/typography/Link";
 import { IoIosAdd } from "react-icons/io";
 import ToggleModalSalary from "../modals/ToggleModalSalary";
+import handelAPI from "../api/handleAPI";
 
 const { Title } = Typography;
 
@@ -12,31 +13,42 @@ const SalaryPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [visible, setVisible] = useState(false);
     const [dataSelected, setDataSelected] = useState(undefined);
-    const [dataSource, setDataSource] = useState([
-        {
-            _id: "nSMưGdssdeobUMm6671v1Zjv",
-            fullName: "Lê Văn A",
-            position: "Nhân viên",
-            wage: 300000, // lương theo ngày
-            workDay: 23,
-            allowance: 500000, // phụ cấp
-            advance: 0, // tạm ứng,
-            status: "paid",
-            date: "10/1/2024"
-        },
-        {
-            _id: "nSM4gtfssdeobUMm6671v1Zjv",
-            fullName: "Lê Văn A",
-            position: "Trưởng khoa",
-            wage: 500000, // lương theo ngày
-            workDay: 23,
-            allowance: 500000, // phụ cấp
-            advance: 0, // tạm ứng,
-            status: "paid",
-            date: "9/1/2024"
-        },
-    ]);
+    const [current, setCurrent] = useState(1);
+    const [pageSize, setPageSize] = useState(5);
+    const [total, setTotal] = useState(0);
+    const [dataSource, setDataSource] = useState([]);
 
+    useEffect(() => {
+        loadData();
+    }, [current, pageSize, status]);
+
+
+    const loadData = async () => {
+        setIsLoading(true);
+        const api = `/salaries?current=${current}&&pageSize=${pageSize}`;
+        try {
+            const res = await handelAPI(api);
+            if (res.data) {
+                setDataSource(res.data);
+                setCurrent(res.meta.current);
+                setPageSize(res.meta.pageSize);
+                setTotal(res.meta.total);
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    const onChangeTable = (pagination, filters, sorter, extra) => {
+        if (pagination.current && pagination.current !== current) {
+            setCurrent(pagination.current);
+        }
+        if (pagination.pageSize && pagination.pageSize !== pageSize) {
+            setPageSize(pagination.pageSize);
+        }
+    }
 
     const columns = [
         {
@@ -56,58 +68,50 @@ const SalaryPage = () => {
             }
         },
         {
-            title: 'Họ tên',
-            dataIndex: "fullName",
+            title: 'Giáo viên',
+            render: (record) => {
+                return record.employeeId.fullName
+            }
         },
         {
-            title: "Chức vụ",
-            dataIndex: "position",
+            title: 'Chức vụ',
+            render: (record) => {
+                return record.employeeId.position
+            }
         },
         {
-            title: "Lương theo tháng",
-            dataIndex: "wage",
-            render: (text, record) => {
-                return (
-                    <Tag color="green">
-                        {record.wage.toLocaleString('it-IT', { style: 'currency', currency: 'VND' })}
-                    </Tag>
+            title: "Lương sở sở",
+            dataIndex: "baseSalary",
+            render: (text) => {
+                return (<Tag color="green">
+                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(text)}
+                </Tag>
                 )
             }
         },
         {
-            title: 'Ngày công',
-            dataIndex: "workDay",
+            title: 'Hệ số lương',
+            dataIndex: "salaryCoefficient",
             align: "center"
         },
         {
             title: 'Phụ cấp',
             dataIndex: "allowance",
-            render: (text, record) => {
+            render: (text) => {
                 return (
-                    <Tag color={record.allowance > 0 ? "lime" : ""}>
-                        {record.allowance.toLocaleString('it-IT', { style: 'currency', currency: 'VND' })}
+                    <Tag color={text > 0 ? "green" : ""}>
+                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(text)}
                     </Tag>
                 )
             }
         },
         {
-            title: 'Tạm ứng',
-            dataIndex: "advance",
+            title: 'Tổng lương',
             render: (text, record) => {
-                return (
-                    <Tag color={record.advance > 0 ? "volcano" : ""}>
-                        {record.advance.toLocaleString('it-IT', { style: 'currency', currency: 'VND' })}
-                    </Tag>
-                )
-            }
-        },
-        {
-            title: 'Lương lĩnh',
-            render: (text, record) => {
-                const salary = (record.wage * record.workDay) + record.allowance - record.advance;
+                const salary = (record.baseSalary * record.salaryCoefficient) + record.allowance;
                 return (
                     <Tag color="cyan">
-                        {salary.toLocaleString('it-IT', { style: 'currency', currency: 'VND' })}
+                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(salary)}
                     </Tag>
                 )
             }
@@ -117,8 +121,8 @@ const SalaryPage = () => {
             dataIndex: "status",
             render: (text, record) => {
                 return (
-                    <Tag color={record.status === "paid" ? "#87d068" : "#f50"}>
-                        {record.status === "paid" ? "Đã thanh toán" : "Chưa thanh toán"}
+                    <Tag color={record.status === "active" ? "#87d068" : "#f50"}>
+                        {record.status === "inactive" ? "Đã thanh toán" : "Chưa thanh toán"}
                     </Tag>
                 )
             }
@@ -151,7 +155,7 @@ const SalaryPage = () => {
                             placement="right"
                             title="Xoá lương"
                             description="Bạn chắc chắn xoá lương này không"
-                            onConfirm={() => handleDeleteApplication(record._id)}
+                            onConfirm={() => handleDeleteSalary(record._id)}
                             onCancel={""}
                             okText="Yes"
                             cancelText="No"
@@ -169,15 +173,25 @@ const SalaryPage = () => {
         },
     ];
 
-    const handleDeleteApplication = async (id) => {
-        setIsLoading(true);
-        const data = dataSource.filter(item => item._id !== id);
-        setDataSource(data);
-        notification.success({
-            message: "Update success",
-            description: "Xoá lương thánh công"
-        });
-        setIsLoading(false);
+    const handleDeleteSalary = async (id) => {
+        const api = `/salaries/delete/${id}`;
+        try {
+            const res = await handelAPI(api, "", "delete");
+            if (res.data) {
+                loadData();
+                notification.success({
+                    message: res.message,
+                    description: "Xoá Lương thành công"
+                })
+            } else {
+                notification.error({
+                    message: "Delete Error",
+                    description: res.message,
+                })
+            }
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     return (
@@ -201,6 +215,9 @@ const SalaryPage = () => {
                 columns={columns}
                 dataSource={dataSource}
                 pagination={{
+                    current: current,
+                    pageSize: pageSize,
+                    total: total,
                     position: ["bottomCenter"],
                     showSizeChanger: true,
                     pageSizeOptions: [5, 10, 20, 50],
@@ -209,13 +226,14 @@ const SalaryPage = () => {
                 scroll={{
                     x: 'max-content'
                 }}
+                onChange={onChangeTable}
                 rowKey="_id"
-                align="center"
             />
 
             <ToggleModalSalary
                 visible={visible}
                 dataSelected={dataSelected}
+                loadData={loadData}
                 onClose={() => {
                     setVisible(false);
                     setDataSelected(undefined);
