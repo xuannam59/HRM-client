@@ -2,56 +2,78 @@ import { DatePicker, Form, Input, InputNumber, Modal, notification, Select } fro
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import handleApi from "../api/handleAPI";
 import { authSelector } from "../redux/reducers/authReducer";
 import { generateString } from "../utils/generateString.util";
 
 const ToggleModalRewardDiscipline = (props) => {
     const {
-        visible, onClose,
-        setDataSource, dataSource,
-        dataSelected
+        visible, onClose, loadData, dataSelected
     } = props
 
     const user = useSelector(authSelector);
     const [isLoading, setIsLoading] = useState(false);
+    const [teachers, setTeachers] = useState(undefined);
+    const [form] = Form.useForm();
 
     useEffect(() => {
         if (dataSelected) {
-            form.setFieldsValue(dataSelected);
+            const data = {
+                ...dataSelected,
+                employeeId: dataSelected.employeeId._id
+            }
+            form.setFieldsValue(data);
         }
     }, [dataSelected]);
 
-    const [form] = Form.useForm();
+    useEffect(() => {
+        getTeachers();
+    }, []);
+
+    const getTeachers = async () => {
+        const apiTeachers = `/schedules/teachers`;
+        try {
+            const resTeachers = await handleApi(apiTeachers);
+            if (resTeachers.data) {
+                const data = resTeachers.data.map(item => {
+                    return {
+                        value: item._id,
+                        label: item.fullName
+                    }
+                });
+                setTeachers(data);
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     const onFinish = async (values) => {
         setIsLoading(true);
-        // Push vào phần tử
-        const data = dataSource;
-        if (!dataSelected) {
-            data.push({
-                ...values,
-                date: new Date()
-            })
-            setDataSource(data);
-        } else {
-            const index = data.findIndex(item => item._id === dataSelected._id);
-            data[index] = {
-                _id: values._id,
-                date: values.date,
-                subject: values.subject,
-                room: values.room
-            };
-
-            setDataSource(data);
+        const api = `/reward-discipline/${dataSelected ? `update/${dataSelected._id}` : "create"}`;
+        try {
+            const res = await handleApi(api, values, `${dataSelected ? "patch" : "post"}`);
+            if (res.data) {
+                handleCancel();
+                loadData();
+                notification.success(dataSelected ? {
+                    message: "Updata Susseccfully",
+                    description: "Cập nhập thưởng/kỷ luật thành công"
+                } : {
+                    message: "Create Susseccfully",
+                    description: "Tạo thưởng/kỷ luật thành công"
+                });
+            } else {
+                notification.error({
+                    message: "Error",
+                    description: res.message
+                });
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsLoading(false);
         }
-        notification.success(dataSelected ? {
-            message: "Update success",
-            description: "Cập nhập phần thưởng thánh công"
-        } : {
-            message: "Create success",
-            description: "Thêm mới phần thưởng thánh công"
-        })
-        setIsLoading(false);
     }
 
     const handleCancel = () => {
@@ -84,37 +106,21 @@ const ToggleModalRewardDiscipline = (props) => {
                     "_id": !dataSelected && generateString(25)
                 }}
             >
-                <Form.Item
-                    name={"_id"}
-                    label={"Mã phần thưởng"}
-                    rules={[
-                        {
-                            required: true,
-                            message: "Vui không được để trống!"
-                        }
-                    ]}
-                >
-
-                    <Input disabled={true} />
-                </Form.Item>
-                <Form.Item
-                    name={"fullName"}
-                    label={"Tên nhân viên"}
-                    rules={[
-                        {
-                            required: true,
-                            message: "Vui không được để trống!"
-                        }
-                    ]}
-                >
-                    <Select options={[
-                        { value: 'Lê Văn E', label: 'Lê Văn E' },
-                        { value: 'Nam Lê', label: 'Nam Lê' },
-                        { value: 'Lê Văn B', label: 'Lê Văn B' },
-                        { value: 'Lê Văn A', label: 'Lê Văn A' },
-                    ]} placeholder="Nhân viên" />
-                </Form.Item>
                 <div className="row">
+                    <div className="col-6">
+                        <Form.Item
+                            name={"employeeId"}
+                            label={"Giáo viên"}
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Vui không được để trống!"
+                                }
+                            ]}
+                        >
+                            <Select options={teachers} placeholder="Giáo viên" />
+                        </Form.Item>
+                    </div>
                     <div className="col-6">
                         <Form.Item
                             name={"types"}
@@ -128,32 +134,12 @@ const ToggleModalRewardDiscipline = (props) => {
                         >
 
                             <Select options={[
-                                { value: 'bonus', label: 'Thưởng' },
+                                { value: 'bonus', label: 'Khen thưởng' },
                                 { value: 'punish', label: 'Kỷ luật' },
-                            ]} placeholder="Nhân viên" />
+                            ]} placeholder="Loại" />
                         </Form.Item>
                     </div>
-                    <div className="col-6">
-                        <Form.Item
-                            name={"money"}
-                            label={"Số tiền"}
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Vui không được để trống!"
-                                }
-                            ]}
-                        >
 
-                            <InputNumber
-                                formatter={(value) => `đ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                parser={(value) => value?.replace(/đ\s?|(,*)/g, '')}
-                                style={{
-                                    width: '100%',
-                                }}
-                            />
-                        </Form.Item>
-                    </div>
                 </div>
                 <Form.Item
                     name={"content"}

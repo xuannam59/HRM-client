@@ -25,7 +25,7 @@ const MainRouter = () => {
                     <SiderComponent />
                     <Layout>
                         <HeaderComponent />
-                        <Content className="mt-3 mb-3 container bg-white rounded-3">
+                        <Content className="mt-3 mb-3 container bg-white rounded-3" style={{ minHeight: "80vh" }}>
                             <Routes>
                                 <Route path="/login" element={user.role !== "admin" ? <Navigate to="/user-info" /> : <Navigate to="/dashboard" />} />
                                 <Route path="/dashboard" element={<HomePage />} />

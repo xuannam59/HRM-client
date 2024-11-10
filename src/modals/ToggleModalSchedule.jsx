@@ -9,8 +9,7 @@ import dayjs from "dayjs";
 const ToggleModalSchedule = (props) => {
     const {
         visible, onClose,
-        setDataSource, dataSource, loadData,
-        dataSelected
+        loadData, dataSelected
     } = props
 
     const user = useSelector(authSelector);
@@ -64,10 +63,10 @@ const ToggleModalSchedule = (props) => {
                 loadData();
                 notification.success(dataSelected ? {
                     message: "Updata Susseccfully",
-                    description: "Cập nhập lịch tuyển thành công"
+                    description: "Cập nhập lịch thành công"
                 } : {
                     message: "Create Susseccfully",
-                    description: "Tạo lịch tuyển thành công"
+                    description: "Tạo lịch thành công"
                 });
             } else {
                 notification.error({
