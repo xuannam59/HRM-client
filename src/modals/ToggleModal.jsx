@@ -6,6 +6,7 @@ import { replaceName } from "../utils/replaceName.util";
 import moment from 'moment';
 import { useSelector } from "react-redux";
 import { authSelector } from "../redux/reducers/authReducer";
+import dayjs from "dayjs";
 
 const { TextArea } = Input;
 
@@ -27,7 +28,7 @@ const ToggleModal = (props) => {
 
     useEffect(() => {
         if (employeeSelected) {
-            employeeSelected.birthday = moment(employeeSelected.birthday);
+            employeeSelected.birthday = dayjs(employeeSelected.birthday);
             setPreview(employeeSelected.avatar);
             form.setFieldsValue(employeeSelected);
         }
@@ -57,7 +58,7 @@ const ToggleModal = (props) => {
         }
         const data = values;
         const api = `/employees/${employeeSelected ? `update/${employeeSelected._id}` : "create"}`;
-        data.birthday = moment(data.birthday).format();
+        data.birthday = dayjs(data.birthday).format();
         if (selectedFile && preview) {
             data.avatar = await uploadFile(selectedFile);
         }

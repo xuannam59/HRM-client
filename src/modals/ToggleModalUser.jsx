@@ -4,6 +4,7 @@ import handleApi from "../api/handleAPI";
 import moment from 'moment';
 import { useSelector } from "react-redux";
 import { authSelector } from "../redux/reducers/authReducer";
+import dayjs from "dayjs";
 
 
 const UserModal = (props) => {
@@ -21,7 +22,7 @@ const UserModal = (props) => {
 
     useEffect(() => {
         if (userSelected) {
-            userSelected.birthday = moment(userSelected.birthday);
+            userSelected.birthday = dayjs(userSelected.birthday);
             setPreview(userSelected.avatar);
             form.setFieldsValue(userSelected);
         }

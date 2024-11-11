@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
 import handelAPI from "../api/handleAPI";
-import { Avatar, Descriptions, notification, Space, Table, Tag, Typography } from "antd";
+import { Avatar, Button, Descriptions, notification, Space, Spin, Table, Tag, Typography } from "antd";
 import { useSelector } from "react-redux";
 import { authSelector } from "../redux/reducers/authReducer";
 import moment from "moment";
 import dayjs from "dayjs";
+import ToggleModal from "../modals/ToggleModal";
+import { MdOutlineEdit } from "react-icons/md";
 
 const { Title } = Typography;
 
 const PersonalInfoPage = () => {
     const user = useSelector(authSelector);
     const [isLoading, setIsLoading] = useState(false);
+    const [visible, setVisible] = useState(false);
     const [dataEmployee, setDataEmployee] = useState({});
     const [dataSchedule, setDataSchedule] = useState([]);
     const [dataSalaries, setDataSalaries] = useState([]);
@@ -70,7 +73,7 @@ const PersonalInfoPage = () => {
         },
         {
             label: 'Ngày sinh',
-            children: moment(dataEmployee.birthday).format("DD/MM/YYYY"),
+            children: dayjs(dataEmployee.birthday).format("DD/MM/YYYY"),
         },
         {
             label: 'Vai trò',
@@ -81,7 +84,7 @@ const PersonalInfoPage = () => {
             children: dataEmployee.address,
         }
     ];
-
+    console.log(dataEmployee)
     const columnsSalary = [
         {
             title: 'STT',
@@ -205,67 +208,74 @@ const PersonalInfoPage = () => {
         },
     ];
 
-    const dataSalary = [{
-        _id: "nSMưGdssdeobUMm6671v1Zjv",
-        fullName: "Lê Văn A",
-        position: "Nhân viên",
-        wage: 300000, // lương theo ngày
-        workDay: 23,
-        allowance: 500000, // phụ cấp
-        advance: 0, // tạm ứng,
-        status: "paid",
-        date: "10/1/2024"
-    }]
-
-
-
-    return (<>
-        <div className="row m-3">
-            <Title level={4}>Thông tin nhân viên: {user.fullName}</Title>
-        </div>
-        <div className="container row justify-content-center m-3">
-            <Avatar src={dataEmployee.avatar} size={100} />
-        </div>
-        <div className="container text-center mt-5">
-            <Descriptions title="Thông tin nhân viên" bordered items={items} />
-        </div>
-        <div className="container text-center mt-5">
+    return (!dataEmployee ? <Spin /> :
+        <>
             <div className="row m-3">
-                <Title level={5}>Lịch dạy</Title>
+                <Title level={4}>Thông tin nhân viên: {user.fullName}</Title>
             </div>
-            <Table
-                loading={isLoading}
-                columns={columnsSchedule}
-                dataSource={dataSchedule}
-                pagination={{
-                    position: ["bottomCenter"],
-                    pageSize: 5,
-                }}
-                rowKey="_id"
-                align="center"
-            />
-        </div>
+            <div className="container row justify-content-center m-3">
+                <Avatar src={dataEmployee.avatar} size={100} />
+            </div>
 
-        <div className="container text-center mt-5">
-            <div className="row m-3">
-                <Title level={5}>Bảng lương</Title>
+            <div className="container text-end">
+                <Button
+                    type="primary"
+                    onClick={() => {
+                        // setEmployeeSelected(item);
+                        setVisible(true);
+                    }}
+                    title="Chỉnh sửa"
+                >Sửa</Button>
             </div>
-            <Table
-                loading={isLoading}
-                columns={columnsSalary}
-                dataSource={dataSalaries}
-                pagination={{
-                    pageSize: 5,
-                    position: ["bottomCenter"],
+            <div className="container text-center mt-5">
+                <Descriptions title="Thông tin nhân viên" bordered items={items} />
+            </div>
+            <div className="container text-center mt-5">
+                <div className="row m-3">
+                    <Title level={5}>Lịch dạy</Title>
+                </div>
+                <Table
+                    loading={isLoading}
+                    columns={columnsSchedule}
+                    dataSource={dataSchedule}
+                    pagination={{
+                        position: ["bottomCenter"],
+                        pageSize: 5,
+                    }}
+                    rowKey="_id"
+                    align="center"
+                />
+            </div>
+
+            <div className="container text-center mt-5">
+                <div className="row m-3">
+                    <Title level={5}>Bảng lương</Title>
+                </div>
+                <Table
+                    loading={isLoading}
+                    columns={columnsSalary}
+                    dataSource={dataSalaries}
+                    pagination={{
+                        pageSize: 5,
+                        position: ["bottomCenter"],
+                    }}
+                    scroll={{
+                        x: 'max-content'
+                    }}
+                    rowKey="_id"
+                    align="center"
+                />
+            </div>
+            <ToggleModal
+                visible={visible}
+                loadData={getData}
+                employeeSelected={dataEmployee}
+                onClose={() => {
+                    setVisible(false);
                 }}
-                scroll={{
-                    x: 'max-content'
-                }}
-                rowKey="_id"
-                align="center"
             />
-        </div>
-    </>);
+        </>
+    );
 }
 
 export default PersonalInfoPage;
