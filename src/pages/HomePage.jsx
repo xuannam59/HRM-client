@@ -17,11 +17,6 @@ const HomePage = () => {
                     <Title level={4}>Tổng quan</Title>
                 </div>
             </div >
-            <div className="row m-3">
-                <div className="col text-right">
-                    <Title level={4}>Cập nhập</Title>
-                </div>
-            </div >
             <Row gutter={[20, 20]}>
                 <Col span={24} md={8}>
                     <Card title="Đơn tuyển dụng" bordered={false} >

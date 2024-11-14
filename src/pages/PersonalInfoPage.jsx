@@ -211,7 +211,7 @@ const PersonalInfoPage = () => {
     return (!dataEmployee ? <Spin /> :
         <>
             <div className="row m-3">
-                <Title level={4}>Thông tin nhân viên: {user.fullName}</Title>
+                <Title level={4}>Thông tin nhân viên: {dataEmployee.fullName}</Title>
             </div>
             <div className="container row justify-content-center m-3">
                 <Avatar src={dataEmployee.avatar} size={100} />

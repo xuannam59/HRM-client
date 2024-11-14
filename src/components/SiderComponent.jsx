@@ -46,12 +46,11 @@ const SiderComponent = () => {
     const user = useSelector(authSelector);
 
     const items = [
-        ...(user.role === "admin" ? [{
+        {
             key: 'dashboard',
             label: <Link to={"/dashboard"}>Tổng quan</Link>,
             icon: <FiPieChart size={20} />
-        }] : []),
-
+        },
         ...(user.role === "admin" ? [{
             key: "employee",
             label: <Link to={"/employee"}>Quản lý nhân viên</Link>,
@@ -70,7 +69,7 @@ const SiderComponent = () => {
             icon: <FaUserPlus size={20} />,
         }] : []),
 
-        ...(user.role === "admin" ? [{
+        ...(user.role === "admin" || user.role === "accountant" ? [{
             key: "schedule",
             label: <Link to={"/schedule"}>Quản lý lịch dạy</Link>,
             icon: <GrSchedule size={20} />,

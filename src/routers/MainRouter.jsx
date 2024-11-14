@@ -27,7 +27,7 @@ const MainRouter = () => {
                         <HeaderComponent />
                         <Content className="mt-3 mb-3 container bg-white rounded-3" style={{ minHeight: "80vh" }}>
                             <Routes>
-                                <Route path="/login" element={user.role !== "admin" ? <Navigate to="/user-info" /> : <Navigate to="/dashboard" />} />
+                                <Route path="/login" element={<Navigate to="/dashboard" />} />
                                 <Route path="/dashboard" element={<HomePage />} />
                                 <Route path="/employee" element={<EmployeePage />} />
                                 <Route path="/user" element={<UserPage />} />
